@@ -1,0 +1,10 @@
+node_modules/
+data/*.json
+data/*.db
+data/uptime/
+!data/.gitkeep
+.env
+*.log
+.DS_Store
+web/public/vendor/leaflet/*.map
+data/first-run.txt
