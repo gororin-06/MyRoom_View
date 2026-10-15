@@ -1,0 +1,13 @@
+services:
+  myroom-view:
+    build: .
+    container_name: myroom-view
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      # 自前監視でLAN内ホストに到達するため host ネットワークが便利な場合は下記に切替:
+      # network_mode: host

@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MyRoom View</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="/vendor/leaflet/leaflet.css">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<div class="stage">
+  <!-- AMBIENT -->
+  <div class="ambient" id="ambient">
+    <section class="slide active" data-key="clock">
+      <div class="amb-top"><span class="status"><span class="dot"></span><span id="roomName">リビング</span></span><span id="ambDate2"></span></div>
+      <div class="amb-body">
+        <div class="greet" id="greet">こんにちは</div>
+        <div class="clock-huge"><span id="bigTime">--:--</span><span class="cl-sec" id="bigSec">00</span></div>
+        <div class="date-big" id="bigDate">----</div>
+      </div>
+    </section>
+
+    <section class="slide" data-key="weather">
+      <div class="amb-top"><span class="status"><span class="dot"></span><span id="wxRegion">—</span>・今日の天気</span><span class="amb-clock">--:--</span></div>
+      <div class="amb-body">
+        <div class="lbl">Weather</div>
+        <div class="wx-now"><div class="wx-ic" id="wxIcon">⛅</div><div><div class="wx-temp" id="wxTemp">--<span class="u">°</span></div><div class="wx-cond" id="wxCond">—</div></div></div>
+        <div class="wx-chips" id="wxChips"></div>
+        <div class="wx-fc" id="wxFc"></div>
+      </div>
+    </section>
+
+    <section class="slide" data-key="room">
+      <div class="amb-top"><span class="status"><span class="dot"></span><span id="roomName2">リビング</span>の状況</span><span class="amb-clock">--:--</span></div>
+      <div class="amb-body">
+        <div class="lbl">Room</div>
+        <div class="room-wrap">
+          <div class="room-temp" id="roomTempBig">--<span class="u">°C</span></div>
+          <div class="room-side">
+            <div class="stat"><div class="k">湿度</div><div class="v" id="roomHum">--%</div></div>
+            <div class="stat"><div class="k">照度</div><div class="v" id="roomLux">-- lx</div></div>
+            <div class="room-ac" id="roomAc">—</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-key="server">
+      <div class="amb-top"><span class="status"><span class="dot"></span>自宅サーバー</span><span class="amb-clock">--:--</span></div>
+      <div class="amb-body"><div class="lbl">Home Servers</div><div class="srv-cards" id="srvCards"></div></div>
+    </section>
+
+    <div class="amb-foot"><div class="dots" id="dots"></div><span class="tap-hint">タッチして操作</span></div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="dash" id="dash">
+    <header class="topbar">
+      <div class="room"><h1 id="roomName3">リビング</h1><span class="status2"><span class="dot" id="remoDot"></span><span id="remoStatus">Nature Remo</span></span></div>
+      <div class="dash-nav" id="dashNav">
+        <button data-page="home" aria-pressed="true">室内・エアコン</button>
+        <button data-page="server" aria-pressed="false">サーバー</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span class="mini-clock" id="miniClock">--:--</span>
+        <button class="ghost" id="settingsBtn" aria-label="設定">⚙</button>
+        <button class="ghost" id="closeBtn" aria-label="閉じる">✕</button>
+      </div>
+    </header>
+
+    <div class="page" id="pageHome">
+      <div class="grid">
+        <section class="panel">
+          <div class="panel-head"><span class="panel-title">室内環境</span><span class="spark-lab">過去24時間の室温</span></div>
+          <div class="env-top"><span class="env-label">室温</span><div class="temp-big" id="dTemp">--<span class="u">°C</span></div></div>
+          <div class="spark" id="spark"></div>
+          <div class="env-sub">
+            <div class="chip-stat"><span class="k">湿度</span><span class="v" id="dHum">--<small>%</small></span></div>
+            <div class="chip-stat"><span class="k">照度</span><span class="v" id="dLux">--<small>lx</small></span></div>
+            <div class="chip-stat"><span class="k">体感</span><span class="v" id="dFeel">—</span></div>
+          </div>
+          <div class="updated" id="dUpdated">—</div>
+        </section>
+
+        <section class="panel" id="ac">
+          <div class="panel-head"><span class="panel-title">エアコン</span><span class="pill on" id="statePill">—</span></div>
+          <div class="ac-hero">
+            <div class="ac-set"><span class="lab2">設定温度</span><span class="num" id="setTemp">--</span><span class="u">°C</span></div>
+            <span class="mode-badge" id="modeBadge"><span class="ic">❄</span><span id="modeName">—</span></span>
+          </div>
+          <div class="ac-detail"><span>風量 <b id="dFan">—</b></span><span>風向 <b id="dDir">—</b></span></div>
+          <div class="controls">
+            <div class="row-power"><button class="btn-power" id="powerBtn"><span>⏻</span><span id="powerLabel">—</span></button></div>
+            <div class="row-temp"><button class="tbtn" id="minus" aria-label="下げる">−</button><div class="tbtn-read"><span class="lab">設定温度</span><span class="big"><span id="setTemp2">--</span>°C</span></div><button class="tbtn" id="plus" aria-label="上げる">＋</button></div>
+            <div class="seg-wrap"><span class="seg-label">運転モード</span>
+              <div class="seg" id="modeSeg">
+                <button data-mode="cool" aria-pressed="false"><span class="ic">❄</span>冷房</button>
+                <button data-mode="warm" aria-pressed="false"><span class="ic">☀</span>暖房</button>
+                <button data-mode="dry" aria-pressed="false"><span class="ic">💧</span>除湿</button>
+                <button data-mode="blow" aria-pressed="false"><span class="ic">🌀</span>送風</button>
+                <button data-mode="auto" aria-pressed="false"><span class="ic">◐</span>自動</button>
+              </div>
+            </div>
+            <div class="seg-wrap"><span class="seg-label">風量</span>
+              <div class="seg" id="fanSeg">
+                <button data-fan="auto" aria-pressed="false">自動</button>
+                <button data-fan="1" aria-pressed="false">弱</button>
+                <button data-fan="2" aria-pressed="false">中</button>
+                <button data-fan="3" aria-pressed="false">強</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div class="page" id="pageServer" hidden>
+      <section class="panel">
+        <div class="panel-head"><span class="panel-title">自宅サーバー</span><span class="spark-lab">ノード: Zabbix ・ サービス: 自前監視</span></div>
+        <div class="srv-cards" id="srvCardsDash"></div>
+      </section>
+    </div>
+  </div>
+
+  <!-- NIGHT -->
+  <div class="night" id="night"><div class="n-time" id="nTime">--:--</div><div class="n-date" id="nDate">----</div><div style="position:absolute;bottom:20px;font-size:12px;color:rgba(255,255,255,.14)">タッチで解除</div></div>
+</div>
+
+<!-- SETTINGS URL (kiosk) -->
+<div class="urlsheet" id="urlsheet">
+  <div class="card">
+    <div style="font-size:18px;font-weight:700;margin-bottom:6px">設定は別端末から</div>
+    <div style="color:var(--muted);font-size:14px">スマホ・PC で下記を開くと設定できます（日本語入力も可）。</div>
+    <div class="u" id="settingsUrl">http://—/settings</div>
+    <button class="ghost" id="urlClose" style="width:auto;padding:0 18px;margin:0 auto">閉じる</button>
+  </div>
+</div>
+
+<!-- DISASTER -->
+<div class="disaster" id="disaster">
+  <div class="dz-bar" id="dzBar">
+    <span class="ic" id="dzIcon">⚠️</span>
+    <div><div class="t" id="dzTitle">—</div><div class="sub" id="dzSub">—</div></div>
+    <button class="close" id="dzClose">閉じる</button>
+  </div>
+  <div class="dz-body">
+    <div id="dzmap"></div>
+    <div class="dz-side" id="dzSide"></div>
+  </div>
+</div>
+
+<script src="/vendor/leaflet/leaflet.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>
