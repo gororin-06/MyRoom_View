@@ -29,6 +29,8 @@
   .srv .sh { display:flex; align-items:center; gap:8px; margin-bottom:10px; } .srv .sh .dot { width:9px; height:9px; border-radius:50%; background:var(--good); flex:none; } .srv.down .sh .dot { background:var(--crit); }
   .srv .sh .nm { flex:1; font-weight:700; font-size:15px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .srv .del { border:1px solid var(--line); background:var(--card); color:var(--crit); border-radius:10px; width:40px; height:40px; flex:none; cursor:pointer; font-size:15px; }
+  .srv .sh-btns { display:flex; gap:6px; flex:none; }
+  .srv .mv { border:1px solid var(--line); background:var(--card); color:var(--fg); border-radius:10px; width:40px; height:40px; cursor:pointer; font-size:15px; } .srv .mv:disabled { opacity:.3; cursor:default; }
   .field { display:flex; flex-direction:column; gap:5px; margin-top:10px; } .field > label { font-size:12px; color:var(--muted); } .field input { width:100%; }
   .svc-wrap { margin-top:12px; } .svc-lab { font-size:12px; color:var(--muted); display:block; margin-bottom:8px; }
   .svc-list { display:flex; flex-direction:column; gap:8px; } .svc-row { display:flex; align-items:center; gap:8px; }

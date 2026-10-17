@@ -87,7 +87,7 @@
         return '<div class="svc-row" data-si="' + si + '"><span class="d"></span><input type="text" data-sf="n" value="' + escAttr(x.name) + '" placeholder="Minecraft"><span class="colon">@</span><input type="text" inputmode="text" data-sf="p" value="' + escAttr(addr) + '" placeholder="192.168.1.30:25565 または 25565"><button class="svc-del">🗑</button></div>';
       }).join("");
       el.innerHTML =
-        '<div class="sh"><span class="dot"></span><span class="nm">' + esc(sv.name || "サーバー") + '</span><button class="del">🗑</button></div>' +
+        '<div class="sh"><span class="dot"></span><span class="nm">' + esc(sv.name || "サーバー") + '</span><span class="sh-btns"><button class="mv srv-up"' + (idx === 0 ? " disabled" : "") + '>↑</button><button class="mv srv-down"' + (idx === (s.servers.length - 1) ? " disabled" : "") + '>↓</button><button class="del">🗑</button></span></div>' +
         '<div class="field"><label>名前</label><input type="text" data-f="name" value="' + escAttr(sv.name) + '"></div>' +
         '<div class="field"><label>接続先 IP / ホスト名</label><input type="text" data-f="host" value="' + escAttr(sv.host) + '" placeholder="192.168.1.30"></div>' +
         '<div class="svc-wrap"><label class="svc-lab">監視サービス（サービス名 と ポート）</label><div class="svc-list">' + rows + '</div><button class="add svc-add" style="margin-top:8px;padding:10px">＋ サービスを追加</button></div>';
@@ -99,6 +99,8 @@
       });
       el.querySelector(".svc-add").addEventListener("click", function () { (sv.services = sv.services || []).push({ name: "", port: null }); commitServers(); renderServers(); });
       el.querySelector(".del").addEventListener("click", function () { s.servers.splice(idx, 1); commitServers(); renderServers(); });
+      el.querySelector(".srv-up").addEventListener("click", function () { if (idx > 0) { var t = s.servers[idx - 1]; s.servers[idx - 1] = s.servers[idx]; s.servers[idx] = t; commitServers(); renderServers(); } });
+      el.querySelector(".srv-down").addEventListener("click", function () { if (idx < s.servers.length - 1) { var t = s.servers[idx + 1]; s.servers[idx + 1] = s.servers[idx]; s.servers[idx] = t; commitServers(); renderServers(); } });
       box.appendChild(el);
     });
   }

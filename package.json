@@ -1,6 +1,6 @@
 {
   "name": "myroom-view",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "private": true,
   "description": "未使用モニターを使った室温・エアコン・自宅サーバーのスマートディスプレイ",
   "type": "module",
