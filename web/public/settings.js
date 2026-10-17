@@ -84,7 +84,7 @@
       var el = document.createElement("div"); el.className = "srv";
       var rows = (sv.services || []).map(function (x, si) {
         var addr = x.host ? x.host + ":" + (x.port == null ? "" : x.port) : (x.port == null ? "" : String(x.port));
-        return '<div class="svc-row" data-si="' + si + '"><span class="d"></span><input type="text" data-sf="n" value="' + escAttr(x.name) + '" placeholder="Minecraft"><span class="colon">@</span><input type="text" inputmode="text" data-sf="p" value="' + escAttr(addr) + '" placeholder="192.168.1.30:25565 または 25565"><button class="svc-del">🗑</button></div>';
+        return '<div class="svc-row" data-si="' + si + '"><span class="d"></span><input type="text" data-sf="n" value="' + escAttr(x.name) + '" placeholder="Minecraft"><span class="colon">@</span><input type="text" inputmode="text" data-sf="p" value="' + escAttr(addr) + '" placeholder="192.168.1.30:25565 または 25565"><button class="svc-mv svc-up"' + (si === 0 ? " disabled" : "") + '>↑</button><button class="svc-mv svc-down"' + (si === ((sv.services || []).length - 1) ? " disabled" : "") + '>↓</button><button class="svc-del">🗑</button></div>';
       }).join("");
       el.innerHTML =
         '<div class="sh"><span class="dot"></span><span class="nm">' + esc(sv.name || "サーバー") + '</span><span class="sh-btns"><button class="mv srv-up"' + (idx === 0 ? " disabled" : "") + '>↑</button><button class="mv srv-down"' + (idx === (s.servers.length - 1) ? " disabled" : "") + '>↓</button><button class="del">🗑</button></span></div>' +
@@ -96,6 +96,8 @@
         var si = +rowEl.getAttribute("data-si");
         rowEl.querySelectorAll("input[data-sf]").forEach(function (inp) { inp.addEventListener("change", function () { var f = this.getAttribute("data-sf"); if (f === "p") { var raw = (this.value || "").trim(); var h = null, p = null; if (raw.indexOf(":") >= 0) { var parts = raw.split(":"); p = parseInt(parts.pop(), 10); h = parts.join(":").trim() || null; } else { p = parseInt(raw, 10); } sv.services[si].host = h || undefined; sv.services[si].port = isNaN(p) ? null : p; } else sv.services[si].name = this.value; commitServers(); }); });
         rowEl.querySelector(".svc-del").addEventListener("click", function () { sv.services.splice(si, 1); commitServers(); renderServers(); });
+        rowEl.querySelector(".svc-up").addEventListener("click", function () { if (si > 0) { var t = sv.services[si - 1]; sv.services[si - 1] = sv.services[si]; sv.services[si] = t; commitServers(); renderServers(); } });
+        rowEl.querySelector(".svc-down").addEventListener("click", function () { if (si < sv.services.length - 1) { var t = sv.services[si + 1]; sv.services[si + 1] = sv.services[si]; sv.services[si] = t; commitServers(); renderServers(); } });
       });
       el.querySelector(".svc-add").addEventListener("click", function () { (sv.services = sv.services || []).push({ name: "", port: null }); commitServers(); renderServers(); });
       el.querySelector(".del").addEventListener("click", function () { s.servers.splice(idx, 1); commitServers(); renderServers(); });
