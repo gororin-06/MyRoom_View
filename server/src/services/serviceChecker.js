@@ -29,11 +29,13 @@ export async function checkAll() {
   const matured = isMatured();
   const results = [];
   for (const srv of servers || []) {
-    const host = srv.host;
     const services = [];
     for (const svc of srv.services || []) {
-      if (!svc.port) {
-        services.push({ name: svc.name, port: null, up: null, ping: null, uptime: null });
+      // サービス個別の host 指定があればそれを、無ければサーバーの host を使う
+      // （設定画面で「IP:ポート」と入力すると svc.host が入る）。
+      const host = svc.host || srv.host;
+      if (!svc.port || !host) {
+        services.push({ name: svc.name, port: svc.port || null, up: null, ping: null, uptime: null });
         continue;
       }
       const key = `${host}:${svc.port}`;
@@ -47,7 +49,7 @@ export async function checkAll() {
         uptime: matured ? uptimeStore.uptime30(key) : null, // 1ヶ月未満は null（＝集計中）
       });
     }
-    results.push({ host, name: srv.name, services });
+    results.push({ host: srv.host, name: srv.name, services });
   }
   return { matured, servers: results };
 }

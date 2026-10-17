@@ -58,7 +58,8 @@
     (s.servers || []).forEach(function (sv, idx) {
       var el = document.createElement("div"); el.className = "srv";
       var rows = (sv.services || []).map(function (x, si) {
-        return '<div class="svc-row" data-si="' + si + '"><span class="d"></span><input type="text" data-sf="n" value="' + escAttr(x.name) + '" placeholder="Minecraft"><span class="colon">:</span><input type="number" inputmode="numeric" data-sf="p" value="' + (x.port == null ? "" : x.port) + '" placeholder="25565"><button class="svc-del">🗑</button></div>';
+        var addr = x.host ? x.host + ":" + (x.port == null ? "" : x.port) : (x.port == null ? "" : String(x.port));
+        return '<div class="svc-row" data-si="' + si + '"><span class="d"></span><input type="text" data-sf="n" value="' + escAttr(x.name) + '" placeholder="Minecraft"><span class="colon">@</span><input type="text" inputmode="text" data-sf="p" value="' + escAttr(addr) + '" placeholder="192.168.1.30:25565 または 25565"><button class="svc-del">🗑</button></div>';
       }).join("");
       el.innerHTML =
         '<div class="sh"><span class="dot"></span><span class="nm">' + esc(sv.name || "サーバー") + '</span><button class="del">🗑</button></div>' +
@@ -68,7 +69,7 @@
       el.querySelectorAll("input[data-f]").forEach(function (inp) { inp.addEventListener("change", function () { sv[this.getAttribute("data-f")] = this.value; if (this.getAttribute("data-f") === "name") el.querySelector(".sh .nm").textContent = this.value; commitServers(); }); });
       el.querySelectorAll(".svc-row").forEach(function (rowEl) {
         var si = +rowEl.getAttribute("data-si");
-        rowEl.querySelectorAll("input[data-sf]").forEach(function (inp) { inp.addEventListener("change", function () { var f = this.getAttribute("data-sf"); if (f === "p") { var v = parseInt(this.value, 10); sv.services[si].port = isNaN(v) ? null : v; } else sv.services[si].name = this.value; commitServers(); }); });
+        rowEl.querySelectorAll("input[data-sf]").forEach(function (inp) { inp.addEventListener("change", function () { var f = this.getAttribute("data-sf"); if (f === "p") { var raw = (this.value || "").trim(); var h = null, p = null; if (raw.indexOf(":") >= 0) { var parts = raw.split(":"); p = parseInt(parts.pop(), 10); h = parts.join(":").trim() || null; } else { p = parseInt(raw, 10); } sv.services[si].host = h || undefined; sv.services[si].port = isNaN(p) ? null : p; } else sv.services[si].name = this.value; commitServers(); }); });
         rowEl.querySelector(".svc-del").addEventListener("click", function () { sv.services.splice(si, 1); commitServers(); renderServers(); });
       });
       el.querySelector(".svc-add").addEventListener("click", function () { (sv.services = sv.services || []).push({ name: "", port: null }); commitServers(); renderServers(); });
