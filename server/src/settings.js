@@ -13,6 +13,7 @@ export const DEFAULT_SETTINGS = {
   weather: true,
   room: true,
   server: true,
+  slideOrder: ["clock", "weather", "room", "server"], // スライドの表示順
   region: "千葉県",
   nightStart: 0,        // 深夜モード 開始(時)
   nightEnd: 6,          // 深夜モード 終了(時)

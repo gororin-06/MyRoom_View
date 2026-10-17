@@ -26,7 +26,32 @@
     fetch("/api/update").then(function (r) { return r.json(); }).catch(function () { return null; }),
   ]).then(function (res) {
     s = res[0] || {}; nodes = (res[1] && res[1].nodes) || []; var upd = res[2];
-    fill(); renderServers(); renderNodes(); renderUpdate(upd);
+    fill(); renderServers(); renderNodes(); renderUpdate(upd); renderSlideOrder();
+  });
+
+  // ---- スライド表示順 ----
+  var SLIDES = [{ k: "clock", label: "時計" }, { k: "weather", label: "天気" }, { k: "room", label: "室内環境" }, { k: "server", label: "自宅サーバー" }];
+  function normOrder(ord) {
+    var keys = SLIDES.map(function (x) { return x.k; });
+    var o = (ord || []).filter(function (k) { return keys.indexOf(k) >= 0; });
+    keys.forEach(function (k) { if (o.indexOf(k) < 0) o.push(k); });
+    return o;
+  }
+  function labelOf(k) { for (var i = 0; i < SLIDES.length; i++) if (SLIDES[i].k === k) return SLIDES[i].label; return k; }
+  function renderSlideOrder() {
+    var box = $("slideOrder"); if (!box) return;
+    var o = normOrder(s.slideOrder);
+    box.innerHTML = o.map(function (k, i) {
+      return '<div class="ord-row"><span class="ord-n">' + (i + 1) + '</span><span class="ord-name">' + esc(labelOf(k)) + '</span><span class="ord-btns"><button data-k="' + k + '" data-dir="up"' + (i === 0 ? " disabled" : "") + '>↑</button><button data-k="' + k + '" data-dir="down"' + (i === o.length - 1 ? " disabled" : "") + '>↓</button></span></div>';
+    }).join("");
+  }
+  if ($("slideOrder")) $("slideOrder").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-k]"); if (!b) return;
+    var o = normOrder(s.slideOrder); var i = o.indexOf(b.getAttribute("data-k"));
+    var j = b.getAttribute("data-dir") === "up" ? i - 1 : i + 1;
+    if (j < 0 || j >= o.length) return;
+    var t = o[i]; o[i] = o[j]; o[j] = t;
+    save({ slideOrder: o }); renderSlideOrder();
   });
 
   function fill() {

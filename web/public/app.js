@@ -283,7 +283,7 @@
   var allSlides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
   var dotsBox = $("dots"), order = [], cur = 0, slideTimer = null;
   function buildOrder() {
-    order = allSlides.filter(function (s) {
+    var vis = allSlides.filter(function (s) {
       var k = s.getAttribute("data-key");
       if (k === "clock") return true;
       if (k === "weather") return settings.weather !== false;
@@ -291,6 +291,13 @@
       if (k === "server") return settings.server !== false;
       return true;
     });
+    var ord = settings.slideOrder || [];
+    vis.sort(function (a, b) {
+      var ia = ord.indexOf(a.getAttribute("data-key")); if (ia < 0) ia = 999;
+      var ib = ord.indexOf(b.getAttribute("data-key")); if (ib < 0) ib = 999;
+      return ia - ib;
+    });
+    order = vis;
     dotsBox.innerHTML = ""; order.forEach(function () { dotsBox.appendChild(document.createElement("span")); });
     if (cur >= order.length) cur = 0; showCur();
   }
