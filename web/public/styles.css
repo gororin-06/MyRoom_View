@@ -79,6 +79,7 @@ body {
 .svc-metrics { display: flex; align-items: baseline; gap: 12px; font-family: var(--f-disp); font-variant-numeric: tabular-nums; }
 .m-ping { font-size: 15px; font-weight: 600; } .m-ping small { font-size: .62em; color: var(--muted); margin-left: 1px; }
 .m-up { font-size: 12px; color: var(--muted); } .m-down { font-size: 13px; font-weight: 600; color: var(--crit); }
+.m-ok { font-size: 13px; font-weight: 600; color: var(--good); }
 
 .amb-foot { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 8px; }
 .dots { display: flex; gap: 8px; } .dots span { width: 8px; height: 8px; border-radius: 50%; background: var(--line); transition: all .3s; } .dots span.on { background: var(--mode); width: 22px; border-radius: 4px; }

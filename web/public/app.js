@@ -159,7 +159,7 @@
       }).join("");
       var svc = (s.services || []).map(function (p) {
         var metric = p.up === false ? '<span class="m-down">● 応答なし</span>'
-          : '<span class="m-ping">' + (p.ping != null ? p.ping : "–") + '<small>ms</small></span>' + (p.uptime != null ? '<span class="m-up">30日 ' + p.uptime + '%</span>' : '<span class="m-up">30日 集計中</span>');
+          : '<span class="m-ok">稼働中</span><span class="m-ping">' + (p.ping != null ? p.ping : "–") + '<small>ms</small></span>' + (p.uptime != null ? '<span class="m-up">30日 ' + p.uptime + '%</span>' : '<span class="m-up">30日 集計中</span>');
         return '<div class="svc-item' + (p.up === false ? " down" : "") + '"><span class="pd"></span><div class="svc-main"><span class="svc-name">' + esc(p.name) + '</span>' + (p.port ? '<span class="svc-port">:' + p.port + "</span>" : "") + '</div><div class="svc-metrics">' + metric + "</div></div>";
       }).join("");
       return '<div class="srv-card' + (s.up === false ? " down" : "") + '"><div class="srv-h"><span class="s"></span><span class="nm">🖥 ' + esc(s.name) + '</span><span class="ip">' + esc(s.host) + '</span></div>' + (hasRes ? '<div class="srv-res">' + res + "</div>" : "") + (svc ? '<div class="srv-svc"><div class="srv-svc-lab">公開サービス</div><div class="svc-list">' + svc + "</div></div>" : "") + "</div>";
