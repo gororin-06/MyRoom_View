@@ -26,8 +26,54 @@
     fetch("/api/update").then(function (r) { return r.json(); }).catch(function () { return null; }),
   ]).then(function (res) {
     s = res[0] || {}; nodes = (res[1] && res[1].nodes) || []; var upd = res[2];
-    fill(); renderServers(); renderNodes(); renderUpdate(upd); renderSlideOrder();
+    stServices = (res[1] && res[1].services) || null; stLights = (res[1] && res[1].lights) || [];
+    fill(); renderServers(); renderNodes(); renderUpdate(upd); renderSlideOrder(); renderProjector();
   });
+
+  // ---- プロジェクター連動 ----
+  var stServices = null, stLights = [];
+  function svcOptions() {
+    var servers = (stServices && stServices.servers) || [];
+    var opts = ['<option value="">—（未選択）</option>'];
+    servers.forEach(function (sv) {
+      (sv.services || []).forEach(function (svc) {
+        if (svc.host == null || svc.port == null) return;
+        var key = svc.host + ":" + svc.port;
+        opts.push('<option value="' + escAttr(key) + '">' + esc((sv.name || "") + " › " + (svc.name || "") + " (" + key + ")") + "</option>");
+      });
+    });
+    return opts.join("");
+  }
+  function lightOptions() {
+    var opts = ['<option value="">—（未選択）</option>'];
+    stLights.forEach(function (l) { opts.push('<option value="' + escAttr(l.id) + '">' + esc(l.name || "照明") + "</option>"); });
+    return opts.join("");
+  }
+  function ensureOption(sel, val) {
+    if (!val || !sel) return;
+    for (var i = 0; i < sel.options.length; i++) if (sel.options[i].value === val) return;
+    var o = document.createElement("option"); o.value = val; o.textContent = val; sel.appendChild(o);
+  }
+  function renderProjector() {
+    var p = s.projector || {};
+    if ($("projTrigger")) $("projTrigger").innerHTML = svcOptions();
+    if ($("projLight")) $("projLight").innerHTML = lightOptions();
+    ensureOption($("projTrigger"), p.trigger);
+    ensureOption($("projLight"), p.lightId);
+    if ($("projEnabled")) $("projEnabled").checked = !!p.enabled;
+    if ($("projTrigger")) $("projTrigger").value = p.trigger || "";
+    if ($("projLight")) $("projLight").value = p.lightId || "";
+    if ($("projSeconds")) $("projSeconds").value = p.seconds || 10;
+  }
+  function saveProjector() {
+    save({ projector: {
+      enabled: $("projEnabled").checked,
+      trigger: $("projTrigger").value,
+      lightId: $("projLight").value,
+      seconds: Math.max(3, Math.min(60, parseInt($("projSeconds").value, 10) || 10)),
+    } });
+  }
+  ["projEnabled", "projTrigger", "projLight", "projSeconds"].forEach(function (id) { if ($(id)) $(id).addEventListener("change", saveProjector); });
 
   // ---- スライド表示順 ----
   var SLIDES = [{ k: "clock", label: "時計" }, { k: "weather", label: "天気" }, { k: "room", label: "室内環境" }, { k: "server", label: "自宅サーバー" }];

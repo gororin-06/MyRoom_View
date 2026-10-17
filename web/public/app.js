@@ -28,6 +28,7 @@
       if (!bootVersion) bootVersion = v;
     }
     render();
+    checkProjector();
   }
   function connect() {
     try {
@@ -171,6 +172,57 @@
     var btn = e.target.closest("button.lbtn"); if (!btn) return;
     sendLight(btn.getAttribute("data-id"), btn.getAttribute("data-btn"));
   });
+
+  // ---------- プロジェクター連動（起動検知→照明オフ確認） ----------
+  var projPrevUp = {};      // host:port -> 直近の疎通状態
+  var projTimer = null, projLeft = 0, projCfg = null, projOpen = false;
+  function findServiceUp(key) {
+    var servers = (state.services && state.services.servers) || [];
+    for (var i = 0; i < servers.length; i++) {
+      var svs = servers[i].services || [];
+      for (var j = 0; j < svs.length; j++) {
+        var svc = svs[j];
+        if (svc.host != null && svc.port != null && (svc.host + ":" + svc.port) === key) return svc.up;
+      }
+    }
+    return undefined;
+  }
+  function checkProjector() {
+    var cfg = settings.projector;
+    if (!cfg || !cfg.enabled || !cfg.trigger || !cfg.lightId) return;
+    var up = findServiceUp(cfg.trigger);
+    if (up === undefined) return;
+    var prev = projPrevUp[cfg.trigger];
+    projPrevUp[cfg.trigger] = up;
+    if (prev === false && up === true) {         // 疎通 OFF→ON（＝起動）
+      var light = (state.lights || []).filter(function (l) { return l.id === cfg.lightId; })[0];
+      if (light && light.power === true) openProjPopup(cfg, light);  // 照明ONの時だけ
+    }
+  }
+  function updateProjCount() {
+    if ($("projCount")) $("projCount").textContent = "あと " + projLeft + " 秒で消灯します";
+    if ($("projOk")) $("projOk").textContent = "消す (" + projLeft + ")";
+  }
+  function openProjPopup(cfg, light) {
+    if (projOpen) return;
+    var pop = $("projPopup"); if (!pop) return;
+    projOpen = true; projCfg = cfg; projLeft = cfg.seconds || 10;
+    if ($("projMsg")) $("projMsg").textContent = "プロジェクターが起動しました。照明「" + (light.name || "") + "」を消しますか？";
+    updateProjCount();
+    pop.classList.add("show");
+    projTimer = setInterval(function () { projLeft--; if (projLeft <= 0) confirmProj(); else updateProjCount(); }, 1000);
+  }
+  function closeProjPopup() {
+    if (projTimer) { clearInterval(projTimer); projTimer = null; }
+    var pop = $("projPopup"); if (pop) pop.classList.remove("show");
+    projOpen = false;
+  }
+  function confirmProj() {
+    var cfg = projCfg; closeProjPopup();
+    if (cfg) sendLight(cfg.lightId, "off");
+  }
+  if ($("projOk")) $("projOk").addEventListener("click", confirmProj);
+  if ($("projCancel")) $("projCancel").addEventListener("click", closeProjPopup);
 
   // ---------- servers (nodes[zabbix] + services[self]) ----------
   function mergeServers() {

@@ -18,6 +18,9 @@ export const DEFAULT_SETTINGS = {
   nightStart: 0,        // 深夜モード 開始(時)
   nightEnd: 6,          // 深夜モード 終了(時)
   autoUpdate: true,
+  // プロジェクター連動：指定サービスが down→up（起動）した時、照明がONなら確認後に消灯
+  // { enabled, trigger: "host:port", lightId, seconds }
+  projector: { enabled: false, trigger: "", lightId: "", seconds: 10 },
   // 自前監視するサービス（Zabbixに無いもの）: ノードのhostごとにサービスを紐付け
   // { host, name, services: [{ name, port }] }
   servers: [],

@@ -35,7 +35,7 @@ export async function checkAll() {
       // （設定画面で「IP:ポート」と入力すると svc.host が入る）。
       const host = svc.host || srv.host;
       if (!svc.port || !host) {
-        services.push({ name: svc.name, port: svc.port || null, up: null, ping: null, uptime: null });
+        services.push({ name: svc.name, host: host || null, port: svc.port || null, up: null, ping: null, uptime: null });
         continue;
       }
       const key = `${host}:${svc.port}`;
@@ -43,6 +43,7 @@ export async function checkAll() {
       uptimeStore.record(key, r.up);
       services.push({
         name: svc.name,
+        host,
         port: svc.port,
         up: r.up,
         ping: r.ping,

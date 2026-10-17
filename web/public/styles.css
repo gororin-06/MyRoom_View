@@ -92,6 +92,16 @@ body {
 .light-btns { display: flex; gap: 8px; flex-wrap: wrap; }
 .lbtn { border: 1px solid var(--line); background: var(--panel-2); color: var(--fg); border-radius: 12px; padding: 12px 18px; font-size: 15px; font-weight: 600; cursor: pointer; }
 .lbtn.on { background: var(--mode-soft); border-color: var(--mode); color: var(--mode); }
+.proj-pop { position: fixed; inset: 0; z-index: 200; display: none; align-items: center; justify-content: center; background: rgba(0,0,0,.55); }
+.proj-pop.show { display: flex; }
+.proj-box { background: var(--panel); border: 1px solid var(--line); border-radius: 22px; padding: 32px 28px; width: min(90vw,460px); text-align: center; box-shadow: var(--shadow); }
+.proj-ic { font-size: 44px; }
+.proj-msg { font-size: 19px; font-weight: 600; margin: 12px 0 6px; line-height: 1.5; }
+.proj-count { font: 600 15px/1 var(--f-disp); color: var(--muted); margin-bottom: 20px; }
+.proj-btns { display: flex; gap: 12px; justify-content: center; }
+.proj-btns button { border-radius: 13px; padding: 14px 24px; font-size: 16px; font-weight: 700; cursor: pointer; border: 1px solid var(--line); }
+.proj-cancel { background: var(--panel-2); color: var(--fg); }
+.proj-ok { background: var(--mode); color: #fff; border-color: var(--mode); }
 
 .amb-foot { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 8px; }
 .dots { display: flex; gap: 8px; } .dots span { width: 8px; height: 8px; border-radius: 50%; background: var(--line); transition: all .3s; } .dots span.on { background: var(--mode); width: 22px; border-radius: 4px; }
