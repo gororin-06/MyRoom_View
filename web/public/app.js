@@ -153,7 +153,8 @@
     var list = mergeServers();
     if (!list.length) return '<div style="color:var(--faint);font-size:13px;padding:8px">サーバー未設定（設定画面から追加、または Zabbix を接続）</div>';
     return list.map(function (s) {
-      var res = [["CPU", s.cpu], ["MEM", s.mem], ["DISK", s.disk]].map(function (r) {
+      var hasRes = s.cpu != null || s.mem != null || s.disk != null;
+      var res = !hasRes ? "" : [["CPU", s.cpu], ["MEM", s.mem], ["DISK", s.disk]].map(function (r) {
         return '<div class="resbar"><span>' + r[0] + '</span><span class="bar"><i style="width:' + (r[1] || 0) + "%;background:" + bcolor(r[1]) + '"></i></span><span class="pc">' + (r[1] != null ? r[1] + "%" : "—") + "</span></div>";
       }).join("");
       var svc = (s.services || []).map(function (p) {
@@ -161,7 +162,7 @@
           : '<span class="m-ping">' + (p.ping != null ? p.ping : "–") + '<small>ms</small></span>' + (p.uptime != null ? '<span class="m-up">30日 ' + p.uptime + '%</span>' : '<span class="m-up">30日 集計中</span>');
         return '<div class="svc-item' + (p.up === false ? " down" : "") + '"><span class="pd"></span><div class="svc-main"><span class="svc-name">' + esc(p.name) + '</span>' + (p.port ? '<span class="svc-port">:' + p.port + "</span>" : "") + '</div><div class="svc-metrics">' + metric + "</div></div>";
       }).join("");
-      return '<div class="srv-card' + (s.up === false ? " down" : "") + '"><div class="srv-h"><span class="s"></span><span class="nm">🖥 ' + esc(s.name) + '</span><span class="ip">' + esc(s.host) + '</span></div><div class="srv-res">' + res + "</div>" + (svc ? '<div class="srv-svc"><div class="srv-svc-lab">公開サービス</div><div class="svc-list">' + svc + "</div></div>" : "") + "</div>";
+      return '<div class="srv-card' + (s.up === false ? " down" : "") + '"><div class="srv-h"><span class="s"></span><span class="nm">🖥 ' + esc(s.name) + '</span><span class="ip">' + esc(s.host) + '</span></div>' + (hasRes ? '<div class="srv-res">' + res + "</div>" : "") + (svc ? '<div class="srv-svc"><div class="srv-svc-lab">公開サービス</div><div class="svc-list">' + svc + "</div></div>" : "") + "</div>";
     }).join("");
   }
   function renderServers() {
