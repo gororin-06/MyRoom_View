@@ -16,9 +16,19 @@
   var state = {};        // 最新の /api/state
   var settings = {};     // state.settings
   var localAc = null;    // 操作中のエアコン値（楽観的更新）
+  var bootVersion = null; // 起動時のアプリ版。アップデート後に変わったら自動リロード
 
   // ---------- data layer (SSE + poll fallback) ----------
-  function applyState(s) { state = s || {}; settings = state.settings || {}; render(); }
+  function applyState(s) {
+    state = s || {}; settings = state.settings || {};
+    // アップデート適用でサーバーが再起動しバージョンが変わったら、表示を自動リロード
+    var v = state.update && state.update.current;
+    if (v) {
+      if (bootVersion && v !== bootVersion) { location.reload(); return; }
+      if (!bootVersion) bootVersion = v;
+    }
+    render();
+  }
   function connect() {
     try {
       var es = new EventSource("/api/stream");
