@@ -9,6 +9,10 @@ import { getSettings } from "../settings.js";
 
 const execFileP = promisify(execFile);
 
+function readFileSafe(p) {
+  try { return fs.readFileSync(p, "utf8"); } catch { return null; }
+}
+
 export function currentVersion() {
   try {
     return "v" + JSON.parse(fs.readFileSync(path.join(ROOT, "package.json"), "utf8")).version;
@@ -65,9 +69,18 @@ async function applyUpdate(latest, log) {
   try {
     if (fs.existsSync(path.join(ROOT, ".git"))) {
       log.info?.("git からアップデートを適用します");
+      const lockPath = path.join(ROOT, "package-lock.json");
+      const lockBefore = readFileSafe(lockPath);
       await execFileP("git", ["fetch", "--tags", "--depth", "1"], { cwd: ROOT });
       await execFileP("git", ["checkout", latest.tag], { cwd: ROOT });
-      await execFileP("npm", ["ci", "--omit=dev"], { cwd: ROOT });
+      // 依存が変わった時だけ再インストール。破壊的な `npm ci`（node_modules を全削除）は
+      // 使わず `npm install` にして、失敗時も既存の node_modules を壊さない（旧状態で起動可能）。
+      if (readFileSafe(lockPath) !== lockBefore) {
+        log.info?.("依存関係が変化したため再インストールします");
+        await execFileP("npm", ["install", "--omit=dev", "--no-audit", "--no-fund"], { cwd: ROOT });
+      } else {
+        log.info?.("依存関係に変更なし。インストールをスキップします");
+      }
       log.info?.("再起動します（supervisor による再起動を想定）");
       process.exit(0);
     } else if (compose) {
