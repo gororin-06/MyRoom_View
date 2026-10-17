@@ -13,7 +13,10 @@
   function save(patch) {
     Object.assign(s, patch);
     fetch("/api/settings", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(patch) })
-      .then(function (r) { return r.json(); }).then(function (next) { s = next; toast(); }).catch(function () {});
+      .then(function (r) { return r.json(); }).then(function () { toast(); }).catch(function () {});
+    // 注意: ここで s を応答で丸ごと差し替えない。差し替えると各カードのハンドラが握る
+    // オブジェクト参照が切れ、「＋サービスを追加」等が効かなくなる。s は上の
+    // Object.assign(s, patch) で既に最新。
   }
 
   // ---- load ----
