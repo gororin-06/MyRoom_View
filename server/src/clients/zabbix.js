@@ -25,10 +25,20 @@ const KEYS = {
   diskPused: ["vfs.fs.size[/,pused]", "vfs.fs.dependent.size[/,pused]"],
 };
 
+// ここで扱う指標はすべて割合(0〜100%)。完全一致を優先し、見つからなければ
+// 同じベースキーの候補を走査する。バイト数など 0〜100 の範囲外の値は誤マッチ
+// とみなして除外する（例: vfs.fs.size[/,total] を使用率として拾ってしまう事故を防ぐ）。
 function pick(items, keys) {
   for (const k of keys) {
-    const it = items.find((i) => i.key_ === k || i.key_.startsWith(k.split("[")[0]));
-    if (it && it.lastvalue !== undefined) return Number(it.lastvalue);
+    const base = k.split("[")[0];
+    const cands = items
+      .filter((i) => i.key_ === k)
+      .concat(items.filter((i) => i.key_ !== k && i.key_.startsWith(base)));
+    for (const it of cands) {
+      if (it.lastvalue === undefined || it.lastvalue === "") continue;
+      const v = Number(it.lastvalue);
+      if (Number.isFinite(v) && v >= 0 && v <= 100) return v;
+    }
   }
   return null;
 }
