@@ -65,7 +65,28 @@ export async function getState() {
     };
   }
 
-  return { room, aircon, raw: { deviceCount: devices.length, applianceCount: appliances.length } };
+  // 照明（LIGHT）
+  const lights = appliances
+    .filter((a) => a.type === "LIGHT" && a.light)
+    .map((a) => {
+      const st = a.light.state || {};
+      return {
+        id: a.id,
+        name: a.nickname || "照明",
+        power: st.power === "on" ? true : st.power === "off" ? false : null,
+        brightness: st.brightness ?? null,
+        buttons: (a.light.buttons || []).map((b) => b.name),
+      };
+    });
+
+  return { room, aircon, lights, raw: { deviceCount: devices.length, applianceCount: appliances.length } };
+}
+
+/** 照明操作。button 例: "on" / "off" / "on-100" / "night" / "bright-up" / "bright-down" */
+export async function setLight(applianceId, button) {
+  const body = new URLSearchParams();
+  body.set("button", String(button));
+  return api(`/1/appliances/${applianceId}/light`, { method: "POST", body });
 }
 
 /** エアコン操作。settings: {power?, mode?, temp?, fan?, dir?} */

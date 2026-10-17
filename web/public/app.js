@@ -37,6 +37,7 @@
     renderWeather();
     renderRoom();
     renderAircon();
+    renderLights();
     renderServers();
     renderSettingsUrl();
     buildOrder();
@@ -131,6 +132,35 @@
   $("minus").addEventListener("click", function () { var ac = acView(); if (ac && ac.temp != null) sendAircon({ temp: ac.temp - 1 }); });
   $("modeSeg").addEventListener("click", function (e) { var b = e.target.closest("button"); if (b) sendAircon({ mode: b.getAttribute("data-mode") }); });
   $("fanSeg").addEventListener("click", function (e) { var b = e.target.closest("button"); if (b) sendAircon({ fan: b.getAttribute("data-fan") }); });
+
+  // ---------- 照明（Nature Remo LIGHT） ----------
+  function renderLights() {
+    var panel = $("lightPanel"); if (!panel) return;
+    var lights = state.lights || [];
+    if (!lights.length) { panel.hidden = true; return; }
+    panel.hidden = false;
+    $("lightList").innerHTML = lights.map(function (l) {
+      var has = function (b) { return (l.buttons || []).indexOf(b) >= 0; };
+      var b = [];
+      b.push('<button class="lbtn' + (l.power === true ? " on" : "") + '" data-id="' + esc(l.id) + '" data-btn="on">点灯</button>');
+      b.push('<button class="lbtn' + (l.power === false ? " on" : "") + '" data-id="' + esc(l.id) + '" data-btn="off">消灯</button>');
+      if (has("bright-up")) b.push('<button class="lbtn" data-id="' + esc(l.id) + '" data-btn="bright-up">明るく</button>');
+      if (has("bright-down")) b.push('<button class="lbtn" data-id="' + esc(l.id) + '" data-btn="bright-down">暗く</button>');
+      if (has("night")) b.push('<button class="lbtn" data-id="' + esc(l.id) + '" data-btn="night">常夜灯</button>');
+      return '<div class="light-row"><span class="light-name">💡 ' + esc(l.name) + "</span><div class=\"light-btns\">" + b.join("") + "</div></div>";
+    }).join("");
+  }
+  function sendLight(id, button) {
+    if (button === "on" || button === "off") {
+      var l = (state.lights || []).filter(function (x) { return x.id === id; })[0];
+      if (l) { l.power = button === "on"; renderLights(); }
+    }
+    fetch("/api/light", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: id, button: button }) }).catch(function () {});
+  }
+  if ($("lightList")) $("lightList").addEventListener("click", function (e) {
+    var btn = e.target.closest("button.lbtn"); if (!btn) return;
+    sendLight(btn.getAttribute("data-id"), btn.getAttribute("data-btn"));
+  });
 
   // ---------- servers (nodes[zabbix] + services[self]) ----------
   function mergeServers() {

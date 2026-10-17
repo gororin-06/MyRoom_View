@@ -9,7 +9,7 @@ import { getSettings } from "../settings.js";
 import { checkAndMaybeUpdate, getUpdateStatus } from "./updater.js";
 
 const state = {
-  room: null, aircon: null,
+  room: null, aircon: null, lights: null,
   weather: null, warnings: null, quake: null, typhoon: null,
   nodes: null, services: null,
   errors: {},
@@ -57,7 +57,7 @@ export function subscribe(res) {
 
 // --- 各ポーリングタスク ---
 async function pollRemo() {
-  try { const r = await remo.getState(); set("room", r.room); set("aircon", r.aircon); }
+  try { const r = await remo.getState(); set("room", r.room); set("aircon", r.aircon); set("lights", r.lights); }
   catch (e) { fail("room", e); }
 }
 async function pollWeather() {

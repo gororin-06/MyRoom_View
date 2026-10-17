@@ -43,6 +43,18 @@ app.post("/api/aircon", async (req, reply) => {
   }
 });
 
+// 照明操作
+app.post("/api/light", async (req, reply) => {
+  const { id, button } = req.body || {};
+  if (!id || !button) return reply.code(400).send({ error: "id と button が必要です" });
+  try {
+    await remo.setLight(id, button);
+    return { ok: true };
+  } catch (e) {
+    return reply.code(502).send({ error: String(e.message) });
+  }
+});
+
 // 設定
 app.get("/api/settings", async () => getSettings());
 app.put("/api/settings", async (req) => {
