@@ -23,6 +23,11 @@ const KEYS = {
   memPused: ["vm.memory.utilization", "vm.memory.size[pused]"],
   memPavail: ["vm.memory.size[pavailable]", "vm.memory.size[available]"],
   diskPused: ["vfs.fs.size[/,pused]", "vfs.fs.dependent.size[/,pused]"],
+  swapPused: ["system.swap.size[,pused]"],
+  swapPfree: ["system.swap.size[,pfree]"],
+  uptime: ["system.uptime"],
+  os: ["system.sw.os", "system.sw.os[name]", "system.uname"],
+  load: ["system.cpu.load[all,avg1]", "system.cpu.load[percpu,avg1]", "system.cpu.load[,avg1]", "system.cpu.load"],
 };
 
 // ここで扱う指標はすべて割合(0〜100%)。完全一致を優先し、見つからなければ
@@ -41,6 +46,26 @@ function pick(items, keys) {
     }
   }
   return null;
+}
+
+// 割合でない値（稼働時間・OS名・ロード等）をそのまま拾う。完全一致を優先。
+function pickRaw(items, keys) {
+  for (const k of keys) {
+    const it = items.find((i) => i.key_ === k);
+    if (it && it.lastvalue !== undefined && it.lastvalue !== "") return it.lastvalue;
+  }
+  for (const k of keys) {
+    const base = k.split("[")[0];
+    const it = items.find((i) => i.key_.startsWith(base) && i.lastvalue !== undefined && i.lastvalue !== "");
+    if (it) return it.lastvalue;
+  }
+  return null;
+}
+
+function pickNum(items, keys) {
+  const v = pickRaw(items, keys);
+  const n = Number(v);
+  return v != null && Number.isFinite(n) ? n : null;
 }
 
 // 直近この秒数以内にデータを受信していれば「稼働中」とみなす（可用性フィールドが
@@ -80,6 +105,11 @@ export async function getNodes() {
       const avail = pick(its, KEYS.memPavail);
       return avail != null ? Math.round(100 - avail) : null;
     })();
+    const swapPused = pick(its, KEYS.swapPused) ?? (() => {
+      const free = pick(its, KEYS.swapPfree);
+      return free != null ? Math.round(100 - free) : null;
+    })();
+    const load = pickNum(its, KEYS.load);
     return {
       hostid: h.hostid,
       name: h.name,
@@ -88,6 +118,10 @@ export async function getNodes() {
       cpu: round(pick(its, KEYS.cpu)),
       mem: round(memPused),
       disk: round(pick(its, KEYS.diskPused)),
+      swap: round(swapPused),
+      load: load == null ? null : Math.round(load * 100) / 100,
+      uptime: pickNum(its, KEYS.uptime),
+      os: pickRaw(its, KEYS.os),
     };
   });
 }

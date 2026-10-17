@@ -138,31 +138,58 @@
     var svcServers = (state.services && state.services.servers) || [];
     var byKey = {};
     nodes.forEach(function (n) {
-      byKey[n.ip || n.name] = { name: n.name, host: n.ip || "", up: n.up, cpu: n.cpu, mem: n.mem, disk: n.disk, services: [] };
+      byKey[n.ip || n.name] = { name: n.name, host: n.ip || "", up: n.up, cpu: n.cpu, mem: n.mem, disk: n.disk, swap: n.swap, load: n.load, uptime: n.uptime, os: n.os, services: [] };
     });
     svcServers.forEach(function (s) {
       var key = s.host || s.name;
-      var card = byKey[key] || (byKey[key] = { name: s.name, host: s.host, up: true, cpu: null, mem: null, disk: null, services: [] });
+      var card = byKey[key] || (byKey[key] = { name: s.name, host: s.host, up: true, cpu: null, mem: null, disk: null, swap: null, load: null, uptime: null, os: null, services: [] });
       card.services = s.services || [];
       if (s.name && !card.name) card.name = s.name;
     });
     return Object.keys(byKey).map(function (k) { return byKey[k]; });
   }
+  function isNode(s) { return s.cpu != null || s.mem != null || s.disk != null || s.swap != null || s.load != null || s.uptime != null || s.os != null; }
   function bcolor(v) { return v == null ? "var(--line)" : v >= 85 ? "var(--crit)" : v >= 70 ? "var(--warn)" : "var(--good)"; }
+  function fmtUptime(sec) { sec = Number(sec) || 0; var d = Math.floor(sec / 86400), h = Math.floor((sec % 86400) / 3600), m = Math.floor((sec % 3600) / 60); if (d > 0) return d + "日" + (h ? " " + h + "h" : ""); if (h > 0) return h + "h" + (m ? " " + m + "m" : ""); return m + "m"; }
+  function fmtClock(ts) { if (!ts) return ""; var d = new Date(ts); return ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2); }
+  function shortOs(v) { v = String(v).replace(/\s+/g, " ").trim(); return v.length > 30 ? v.slice(0, 30) + "…" : v; }
+  function srvSummary(list) {
+    var ns = list.filter(isNode);
+    var svc = list.reduce(function (a, s) { return a.concat((s.services || []).filter(function (p) { return p.up != null; })); }, []);
+    var upN = ns.filter(function (s) { return s.up !== false; }).length;
+    var upS = svc.filter(function (p) { return p.up !== false; }).length;
+    var u = state.updatedAt || {};
+    var upd = Math.max(u.nodes || 0, u.services || 0);
+    var bits = [];
+    if (ns.length) bits.push("ノード <b>" + upN + "/" + ns.length + "</b> 稼働");
+    if (svc.length) bits.push("サービス <b>" + upS + "/" + svc.length + "</b> 稼働");
+    if (upd) bits.push("最終更新 " + fmtClock(upd));
+    return bits.length ? '<div class="srv-summary">' + bits.join(' <span class="sep">・</span> ') + "</div>" : "";
+  }
   function serverCardsHTML() {
     var list = mergeServers();
     if (!list.length) return '<div style="color:var(--faint);font-size:13px;padding:8px">サーバー未設定（設定画面から追加、または Zabbix を接続）</div>';
-    return list.map(function (s) {
-      var hasRes = s.cpu != null || s.mem != null || s.disk != null;
-      var res = !hasRes ? "" : [["CPU", s.cpu], ["MEM", s.mem], ["DISK", s.disk]].map(function (r) {
+    return srvSummary(list) + list.map(function (s) {
+      var node = isNode(s);
+      var bars = [["CPU", s.cpu], ["MEM", s.mem], ["DISK", s.disk]];
+      if (s.swap != null) bars.push(["SWAP", s.swap]);
+      var res = !node ? "" : bars.map(function (r) {
         return '<div class="resbar"><span>' + r[0] + '</span><span class="bar"><i style="width:' + (r[1] || 0) + "%;background:" + bcolor(r[1]) + '"></i></span><span class="pc">' + (r[1] != null ? r[1] + "%" : "—") + "</span></div>";
       }).join("");
+      var meta = "";
+      if (node) {
+        var mp = [];
+        if (s.os) mp.push('<span class="mi">' + esc(shortOs(s.os)) + "</span>");
+        if (s.uptime != null) mp.push('<span class="mi">稼働 ' + fmtUptime(s.uptime) + "</span>");
+        if (s.load != null) mp.push('<span class="mi">負荷 ' + (s.load < 10 ? s.load.toFixed(2) : s.load.toFixed(1)) + "</span>");
+        if (mp.length) meta = '<div class="srv-meta">' + mp.join("") + "</div>";
+      }
       var svc = (s.services || []).map(function (p) {
         var metric = p.up === false ? '<span class="m-down">● 応答なし</span>'
-          : '<span class="m-ok">稼働中</span><span class="m-ping">' + (p.ping != null ? p.ping : "–") + '<small>ms</small></span>' + (p.uptime != null ? '<span class="m-up">30日 ' + p.uptime + '%</span>' : '<span class="m-up">30日 集計中</span>');
+          : '<span class="m-ok">稼働中</span><span class="m-ping">' + (p.ping != null ? p.ping : "–") + '<small>ms</small></span>' + (p.uptime != null ? '<span class="m-up">30日 ' + p.uptime + '%</span>' : '');
         return '<div class="svc-item' + (p.up === false ? " down" : "") + '"><span class="pd"></span><div class="svc-main"><span class="svc-name">' + esc(p.name) + '</span>' + (p.port ? '<span class="svc-port">:' + p.port + "</span>" : "") + '</div><div class="svc-metrics">' + metric + "</div></div>";
       }).join("");
-      return '<div class="srv-card' + (s.up === false ? " down" : "") + '"><div class="srv-h"><span class="s"></span><span class="nm">🖥 ' + esc(s.name) + '</span><span class="ip">' + esc(s.host) + '</span></div>' + (hasRes ? '<div class="srv-res">' + res + "</div>" : "") + (svc ? '<div class="srv-svc"><div class="srv-svc-lab">公開サービス</div><div class="svc-list">' + svc + "</div></div>" : "") + "</div>";
+      return '<div class="srv-card' + (s.up === false ? " down" : "") + '"><div class="srv-h"><span class="s"></span><span class="nm">🖥 ' + esc(s.name) + '</span><span class="ip">' + esc(s.host) + '</span></div>' + (node ? '<div class="srv-res">' + res + "</div>" + meta : "") + (svc ? '<div class="srv-svc"><div class="srv-svc-lab">公開サービス</div><div class="svc-list">' + svc + "</div></div>" : "") + "</div>";
     }).join("");
   }
   function renderServers() {
