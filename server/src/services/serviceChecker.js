@@ -4,7 +4,7 @@ import net from "node:net";
 import { getSettings, isMatured } from "../settings.js";
 import * as uptimeStore from "./uptimeStore.js";
 
-function tcpCheck(host, port, timeout = 3000) {
+export function tcpCheck(host, port, timeout = 3000) {
   return new Promise((resolve) => {
     const start = performance.now();
     const sock = new net.Socket();

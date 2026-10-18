@@ -4,7 +4,7 @@ import { config } from "../config.js";
 import * as remo from "../clients/natureRemo.js";
 import * as jma from "../clients/jma.js";
 import * as zabbix from "../clients/zabbix.js";
-import { checkAll } from "./serviceChecker.js";
+import { checkAll, tcpCheck } from "./serviceChecker.js";
 import { getSettings } from "../settings.js";
 import { checkAndMaybeUpdate, getUpdateStatus } from "./updater.js";
 
@@ -12,6 +12,7 @@ const state = {
   room: null, aircon: null, lights: null,
   weather: null, warnings: null, quake: null, typhoon: null,
   nodes: null, services: null,
+  projectorUp: null,   // プロジェクター連動の裏チェック（true/false/null=無効）
   errors: {},
   updatedAt: {},
 };
@@ -81,6 +82,16 @@ async function pollZabbix() {
 }
 async function pollServices() {
   try { set("services", await checkAll()); } catch (e) { fail("services", e); }
+  // プロジェクター連動の裏チェック（サーバー一覧には出さない）
+  try {
+    const p = getSettings().projector || {};
+    if (p.enabled && p.host && p.port) {
+      const r = await tcpCheck(p.host, Number(p.port));
+      state.projectorUp = r.up;
+    } else {
+      state.projectorUp = null;
+    }
+  } catch { state.projectorUp = null; }
 }
 
 // JMA 地域コード（settings.region → コード）

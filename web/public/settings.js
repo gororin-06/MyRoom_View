@@ -32,18 +32,6 @@
 
   // ---- プロジェクター連動 ----
   var stServices = null, stLights = [];
-  function svcOptions() {
-    var servers = (stServices && stServices.servers) || [];
-    var opts = ['<option value="">—（未選択）</option>'];
-    servers.forEach(function (sv) {
-      (sv.services || []).forEach(function (svc) {
-        if (svc.host == null || svc.port == null) return;
-        var key = svc.host + ":" + svc.port;
-        opts.push('<option value="' + escAttr(key) + '">' + esc((sv.name || "") + " › " + (svc.name || "") + " (" + key + ")") + "</option>");
-      });
-    });
-    return opts.join("");
-  }
   function lightOptions() {
     var opts = ['<option value="">—（未選択）</option>'];
     stLights.forEach(function (l) { opts.push('<option value="' + escAttr(l.id) + '">' + esc(l.name || "照明") + "</option>"); });
@@ -56,24 +44,26 @@
   }
   function renderProjector() {
     var p = s.projector || {};
-    if ($("projTrigger")) $("projTrigger").innerHTML = svcOptions();
-    if ($("projLight")) $("projLight").innerHTML = lightOptions();
-    ensureOption($("projTrigger"), p.trigger);
-    ensureOption($("projLight"), p.lightId);
+    if ($("projLight")) { $("projLight").innerHTML = lightOptions(); ensureOption($("projLight"), p.lightId); }
     if ($("projEnabled")) $("projEnabled").checked = !!p.enabled;
-    if ($("projTrigger")) $("projTrigger").value = p.trigger || "";
+    if ($("projAddr")) $("projAddr").value = p.host ? (p.host + (p.port ? ":" + p.port : "")) : "";
     if ($("projLight")) $("projLight").value = p.lightId || "";
     if ($("projSeconds")) $("projSeconds").value = p.seconds || 10;
   }
   function saveProjector() {
+    var raw = ($("projAddr").value || "").trim();
+    var host = "", port = null;
+    if (raw.indexOf(":") >= 0) { var parts = raw.split(":"); port = parseInt(parts.pop(), 10); host = parts.join(":").trim(); }
+    else { host = raw; }
     save({ projector: {
       enabled: $("projEnabled").checked,
-      trigger: $("projTrigger").value,
+      host: host,
+      port: isNaN(port) ? null : port,
       lightId: $("projLight").value,
       seconds: Math.max(3, Math.min(60, parseInt($("projSeconds").value, 10) || 10)),
     } });
   }
-  ["projEnabled", "projTrigger", "projLight", "projSeconds"].forEach(function (id) { if ($(id)) $(id).addEventListener("change", saveProjector); });
+  ["projEnabled", "projAddr", "projLight", "projSeconds"].forEach(function (id) { if ($(id)) $(id).addEventListener("change", saveProjector); });
 
   // ---- スライド表示順 ----
   var SLIDES = [{ k: "clock", label: "時計" }, { k: "weather", label: "天気" }, { k: "room", label: "室内環境" }, { k: "server", label: "自宅サーバー" }];

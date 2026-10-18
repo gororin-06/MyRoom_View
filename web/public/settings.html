@@ -82,7 +82,7 @@
     <h2>プロジェクター連動（照明オフ）</h2>
     <div class="desc">指定した監視サービスが「起動（疎通OFF→ON）」した時、照明がONなら確認ポップアップを表示し、OKまたは一定秒数で消灯します。</div>
     <div class="row"><div class="lab">有効</div><label class="sw"><input type="checkbox" id="projEnabled"><span class="tr"></span></label></div>
-    <div class="row"><div><div class="lab">トリガー（監視サービス）</div><div class="hint">このサービスの疎通がOFF→ONで発動</div></div><select id="projTrigger"><option value="">—</option></select></div>
+    <div class="row"><div><div class="lab">プロジェクターの接続先</div><div class="hint">IP:ポート（GoogleTVなら 8008 など、起動で開くポート）。サーバー一覧には表示されません</div></div><input type="text" id="projAddr" placeholder="192.168.0.50:8008" style="min-width:200px"></div>
     <div class="row"><div><div class="lab">消す照明</div><div class="hint">Nature Remo の照明</div></div><select id="projLight"><option value="">—</option></select></div>
     <div class="row"><div><div class="lab">確認の秒数</div><div class="hint">この秒数で自動的に消灯</div></div><input type="number" id="projSeconds" min="3" max="60" style="width:80px"></div>
   </section>

@@ -174,26 +174,15 @@
   });
 
   // ---------- プロジェクター連動（起動検知→照明オフ確認） ----------
-  var projPrevUp = {};      // host:port -> 直近の疎通状態
+  var projPrevUp = null;    // 直近のプロジェクター疎通状態
   var projTimer = null, projLeft = 0, projCfg = null, projOpen = false;
-  function findServiceUp(key) {
-    var servers = (state.services && state.services.servers) || [];
-    for (var i = 0; i < servers.length; i++) {
-      var svs = servers[i].services || [];
-      for (var j = 0; j < svs.length; j++) {
-        var svc = svs[j];
-        if (svc.host != null && svc.port != null && (svc.host + ":" + svc.port) === key) return svc.up;
-      }
-    }
-    return undefined;
-  }
   function checkProjector() {
     var cfg = settings.projector;
-    if (!cfg || !cfg.enabled || !cfg.trigger || !cfg.lightId) return;
-    var up = findServiceUp(cfg.trigger);
-    if (up === undefined) return;
-    var prev = projPrevUp[cfg.trigger];
-    projPrevUp[cfg.trigger] = up;
+    if (!cfg || !cfg.enabled || !cfg.lightId) return;
+    var up = state.projectorUp;                 // サーバーの裏チェック結果（true/false/null）
+    if (up !== true && up !== false) return;
+    var prev = projPrevUp;
+    projPrevUp = up;
     if (prev === false && up === true) {         // 疎通 OFF→ON（＝起動）
       var light = (state.lights || []).filter(function (l) { return l.id === cfg.lightId; })[0];
       if (light && light.power === true) openProjPopup(cfg, light);  // 照明ONの時だけ
