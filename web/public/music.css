@@ -1,0 +1,21 @@
+/* Shared music form controls. The listening screen lives in music-player.css. */
+.music { color: var(--fg); }
+.music h2 { margin: 0 0 18px; font-size: 20px; }
+.music label { display: block; margin: 12px 0 8px; font-weight: 500; }
+.music input:not([type=checkbox]), .music select, .music button { font: inherit; color: var(--fg); border: 1px solid var(--line); border-radius: 10px; background: var(--panel-2, var(--card)); padding: 12px; min-height: 46px; max-width: 100%; }
+.music input[type=range] { width: 100%; padding: 0; accent-color: var(--accent); }
+.music input[type=checkbox] { width: 20px; height: 20px; vertical-align: middle; }
+.music button { cursor: pointer; }
+.music button:disabled { opacity: .4; cursor: default; }
+.music button:hover:enabled { border-color: var(--accent); }
+.music p { color: var(--muted); line-height: 1.7; overflow-wrap: anywhere; }
+.music .music-error { color: var(--crit); }
+.music svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.music button.button-primary { background: var(--accent); color: #17251b; border-color: var(--accent); font-weight: 700; }
+.connection-badge { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); padding: 6px 9px; border-radius: 99px; background: var(--panel-2); white-space: nowrap; }
+.connection-badge i { width: 5px; height: 5px; background: var(--faint); border-radius: 50%; }
+.connection-badge[data-state=connected] { color: var(--accent); background: #b5d5b512; }
+.connection-badge[data-state=connected] i { background: var(--accent); }
+.music-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.music-config input[type=url], .music-config input[type=password], .music-config select { width: 100%; }
+.music-config .music-buttons { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }

@@ -8,3 +8,6 @@ data/uptime/
 .DS_Store
 web/public/vendor/leaflet/*.map
 data/first-run.txt
+data/music-assistant.json.tmp
+data/desktop.json.tmp
+data/spacedesk-viewer/

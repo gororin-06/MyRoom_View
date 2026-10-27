@@ -9,11 +9,26 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="/vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/theme.css">
+<link rel="stylesheet" href="/music.css">
+<link rel="stylesheet" href="/music-player.css">
+<link rel="stylesheet" href="/music-ambient.css">
+<link rel="stylesheet" href="/desktop.css">
 </head>
 <body>
 <div class="stage">
   <!-- AMBIENT -->
-  <div class="ambient" id="ambient">
+  <div class="ambient" id="ambient" role="button" tabindex="0" aria-label="操作画面を開く">
+    <section class="music-ambient" id="musicAmbient" aria-labelledby="ambientMusicTitle" hidden>
+      <img id="ambientMusicBackdrop" class="ambient-music-backdrop" alt="" referrerpolicy="no-referrer" hidden>
+      <div class="ambient-music-shade" aria-hidden="true"></div>
+      <header class="ambient-music-header"><div class="ambient-music-brand"><span class="ambient-music-logo" aria-hidden="true">▶</span><span>Music<small>MYROOM VIEW</small></span></div><div class="ambient-music-clock"><time id="ambientMusicTime">--:--</time><span id="ambientMusicDate">----</span></div></header>
+      <div class="ambient-music-main">
+        <div class="ambient-music-cover" id="ambientMusicCover"><div class="ambient-music-fallback" aria-hidden="true"><div></div><span>♫</span></div><img id="ambientMusicImage" alt="" referrerpolicy="no-referrer" hidden></div>
+        <div class="ambient-music-details"><div class="ambient-music-playing"><span class="ambient-music-bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>NOW PLAYING</div><h2 id="ambientMusicTitle">再生中の音楽</h2><p id="ambientMusicArtist"></p><div class="ambient-music-device"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1"/><path d="M8 21h8M12 16v5"/></svg><span id="ambientMusicDevice"></span></div><div class="ambient-music-timeline"><progress id="ambientMusicProgress" max="100" value="0" aria-label="再生位置"></progress><div><span id="ambientMusicElapsed">--:--</span><span id="ambientMusicDuration">--:--</span></div></div></div>
+      </div>
+      <footer class="ambient-music-footer"><div class="ambient-music-room"><span id="roomNameMusic">リビング</span><span id="ambientMusicRoom"></span></div><span class="ambient-music-hint"><span aria-hidden="true">↗</span> タッチして音楽を操作</span></footer>
+    </section>
     <section class="slide active" data-key="clock">
       <div class="amb-top"><span class="status"><span class="dot"></span><span id="roomName">リビング</span></span><span id="ambDate2"></span></div>
       <div class="amb-body">
@@ -61,8 +76,10 @@
     <header class="topbar">
       <div class="room"><h1 id="roomName3">リビング</h1><span class="status2"><span class="dot" id="remoDot"></span><span id="remoStatus">Nature Remo</span></span></div>
       <div class="dash-nav" id="dashNav">
-        <button data-page="home" aria-pressed="true">室内・エアコン</button>
-        <button data-page="server" aria-pressed="false">サーバー</button>
+        <button data-page="home" aria-pressed="true"><span class="nav-icon" aria-hidden="true">⌂</span>室内・エアコン</button>
+        <button data-page="server" aria-pressed="false"><span class="nav-icon" aria-hidden="true">▤</span>サーバー</button>
+        <button data-page="music" aria-pressed="false"><span class="nav-icon" aria-hidden="true">♫</span>音楽</button>
+        <button data-page="desktop" aria-pressed="false"><span class="nav-icon" aria-hidden="true">▣</span>拡張画面</button>
       </div>
       <div style="display:flex;align-items:center;gap:12px">
         <span class="mini-clock" id="miniClock">--:--</span>
@@ -128,6 +145,55 @@
         <div class="srv-cards" id="srvCardsDash"></div>
       </section>
     </div>
+
+    <div class="page desktop-page" id="pageDesktop" hidden>
+      <div class="desktop-toolbar"><div><span class="eyebrow">EXTENDED DISPLAY</span><h2 id="desktopName">デスクトップPC</h2></div><label class="desktop-target-select">接続先PC<select id="desktopTarget" aria-label="接続先PC"><option value="">PCを登録してください</option></select></label><div class="desktop-toolbar-actions"><button type="button" id="desktopFullscreen">全画面</button><button type="button" id="desktopStop" disabled>接続を閉じる</button><button type="button" id="desktopReturn">MyRoomへ戻る</button></div></div>
+      <p id="desktopStatus" role="status">接続設定を読み込み中…</p>
+      <div class="desktop-welcome" id="desktopWelcome"><div class="desktop-monitor-art" aria-hidden="true"><div class="desktop-monitor-primary"><span>DESKTOP PC</span><i></i></div><div class="desktop-monitor-secondary"><span>MYROOM VIEW</span><i></i></div><span class="desktop-monitor-plus">＋</span></div><h2>いつもの画面を、もう一枚。</h2><p>Windowsの作業領域を、このディスプレイへ拡張します。</p><button class="desktop-primary" type="button" id="desktopStart" disabled>拡張画面を開く ↗</button><a href="/settings#desktop">接続設定・セットアップ</a><p class="desktop-small">拡張元のPCにはspacedesk DRIVERが必要です。ビューアー内で接続を確認してください。</p></div>
+      <iframe id="desktopViewer" title="spacedesk 拡張ディスプレイ" sandbox="allow-scripts allow-same-origin allow-pointer-lock" allow="autoplay; fullscreen 'none'" referrerpolicy="no-referrer" hidden></iframe>
+    </div>
+
+    <div class="page music yt-music" id="pageMusic" hidden>
+      <header class="yt-topbar">
+        <div class="yt-brand-area"><button id="musicMenuToggle" type="button" class="yt-icon-button" aria-label="ナビゲーションを開閉" aria-controls="musicSidebar" aria-expanded="false"><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><button id="musicBrandHome" type="button" class="yt-brand" aria-label="音楽のホーム"><span class="yt-logo" aria-hidden="true"><i></i></span><span>Music</span><small>MYROOM</small></button></div>
+        <form id="musicSearch" class="yt-search"><div class="yt-search-field"><svg class="" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><label class="music-sr" for="musicQuery">曲名・アーティスト名など</label><input id="musicQuery" type="search" maxlength="200" placeholder="曲、アルバム、プレイリストを検索" required autocomplete="off"></div><button id="musicSearchButton" type="submit" disabled>検索</button><label class="music-sr" for="musicType">検索する種類</label><select id="musicType" class="music-sr"><option value="track">曲</option><option value="album">アルバム</option><option value="playlist">プレイリスト</option></select></form>
+        <div class="yt-header-actions"><button id="musicDeviceToggle" type="button" class="yt-icon-button" aria-label="再生先を選択" aria-controls="musicDevicePanel" aria-expanded="false"><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8V4h18v16h-9M3 14a6 6 0 0 1 6 6M3 10a10 10 0 0 1 10 10"/><circle cx="3" cy="20" r="1"/></svg></button><a class="yt-icon-button" href="/settings#music" aria-label="音楽の接続設定"><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 3-1 3-3 1-2 3 2 2-1 4 3 2 3-1 3 3 3-2 1-3 3-1 1-4-3-2-1-3-4 1z"/><circle cx="12" cy="12" r="3"/></svg></a></div>
+      </header>
+      <div class="yt-workspace">
+        <button id="musicSidebarBackdrop" class="yt-sidebar-backdrop" type="button" aria-label="ナビゲーションを閉じる" hidden></button>
+        <aside id="musicSidebar" class="yt-sidebar">
+          <nav aria-label="音楽のナビゲーション"><button type="button" data-music-view="home" aria-current="page"><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v11h-6v-7H9v7H3z"/></svg><span>ホーム</span></button><button type="button" data-music-view="search"><svg class="" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><span>曲を検索</span></button><button type="button" data-music-view="playlist"><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h12M4 10h12M4 15h7M17 13v8M13 17h8"/></svg><span>プレイリスト</span></button><button type="button" id="musicSidebarDevices"><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8V4h18v16h-9M3 14a6 6 0 0 1 6 6M3 10a10 10 0 0 1 10 10"/><circle cx="3" cy="20" r="1"/></svg><span>再生デバイス</span></button></nav>
+          <div class="yt-sidebar-section"><span class="yt-sidebar-label">最近の検索</span><div id="musicRecentSearches"><p>検索した音楽が<br>ここに表示されます</p></div></div>
+          <div class="yt-sidebar-bottom"><button type="button" id="musicReturnHome"><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 5-7 7 7 7M5 12h15"/></svg><span>MyRoom Viewに戻る</span></button><a href="/settings#music"><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 3-1 3-3 1-2 3 2 2-1 4 3 2 3-1 3 3 3-2 1-3 3-1 1-4-3-2-1-3-4 1z"/><circle cx="12" cy="12" r="3"/></svg><span>接続設定</span></a><p>Music Assistant 連携</p></div>
+        </aside>
+        <main class="yt-content" id="musicContent">
+          <div class="yt-filterbar" role="group" aria-label="検索する種類"><button type="button" data-music-type="track" aria-pressed="true">曲</button><button type="button" data-music-type="album" aria-pressed="false">アルバム</button><button type="button" data-music-type="playlist" aria-pressed="false">プレイリスト</button></div>
+          <div class="yt-page-title"><div><p id="musicSectionEyebrow">MYROOM MUSIC</p><h1 id="musicSectionTitle">聴きたい音楽を、いつでも。</h1></div><span id="musicDeviceStatus" class="connection-badge" data-state="idle"><i></i><span>未接続</span></span></div>
+          <p id="musicConnection" class="yt-connection" role="status">設定画面でMusic Assistantを接続してください。</p>
+          <p id="musicSearchStatus" class="yt-search-status" role="status" aria-live="polite">登録した音楽サービスとライブラリーから探せます。</p>
+          <div id="musicHome" class="yt-home">
+            <div class="yt-mood-heading"><h2>気分に合わせて探す</h2><span>プレイリストを検索</span></div>
+            <div class="yt-mood-grid">
+              <button type="button" data-music-query="リラックス" class="yt-mood-card mood-relax"><span class="yt-mood-art"><i></i><strong>Relax<br>& unwind</strong><span class="yt-card-play">▶</span></span><b>ゆっくり過ごす</b><small>ひと息つきたい時間に</small></button>
+              <button type="button" data-music-query="作業用BGM" class="yt-mood-card mood-focus"><span class="yt-mood-art"><i></i><strong>In the<br>zone.</strong><span class="yt-card-play">▶</span></span><b>集中したいとき</b><small>作業に寄り添う音楽</small></button>
+              <button type="button" data-music-query="ドライブ" class="yt-mood-card mood-drive"><span class="yt-mood-art"><i></i><strong>On the<br>road</strong><span class="yt-card-play">▶</span></span><b>気分を上げる</b><small>ドライブにぴったりの曲</small></button>
+              <button type="button" data-music-query="睡眠" class="yt-mood-card mood-sleep"><span class="yt-mood-art"><i></i><strong>After<br>hours</strong><span class="yt-card-play">▶</span></span><b>おやすみの前に</b><small>静かな夜のために</small></button>
+            </div>
+          </div>
+          <div id="musicEmpty" class="music-empty" hidden><div class="yt-empty-symbol"><svg class="" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg></div><h3>お気に入りを探してみましょう</h3><p>曲名やアーティスト名を入力して検索してください。</p></div>
+          <div id="musicResults" class="music-results"></div>
+          <a href="/settings#music" class="yt-setup-link" id="musicSetupLink">音楽サーバーに接続して、再生を始める ↗</a>
+          <p id="musicActionStatus" class="yt-action-status" role="status" aria-live="polite"></p>
+        </main>
+      </div>
+      <section class="yt-device-panel" id="musicDevicePanel" aria-labelledby="musicDeviceHeading" hidden><div class="yt-device-heading"><div><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8V4h18v16h-9M3 14a6 6 0 0 1 6 6M3 10a10 10 0 0 1 10 10"/><circle cx="3" cy="20" r="1"/></svg><h2 id="musicDeviceHeading">再生先を選択</h2></div><button id="musicDeviceClose" type="button" class="yt-icon-button" aria-label="再生先を閉じる"><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M6 18 18 6"/></svg></button></div><label for="musicPlayer">利用可能なデバイス</label><select id="musicPlayer"><option value="">再生先を接続してください</option></select><button id="musicRefresh" type="button">再生先を更新</button><p>再生先を変更したあとは、曲を選び直してください。</p><a href="/settings#music">デバイスの接続設定 ↗</a></section>
+      <footer class="yt-playerbar music-player" aria-label="音楽プレイヤー">
+        <progress id="musicProgress" max="100" value="0" aria-label="再生位置"></progress>
+        <div class="yt-transport"><button type="button" data-music-action="previous" class="yt-icon-button" aria-label="前の曲" disabled><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5v14M19 5l-10 7 10 7z"/></svg></button><button type="button" data-music-action="play_pause" id="musicPause" class="yt-icon-button yt-main-play" aria-label="再生" disabled><svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 4 12 8-12 8z"/></svg><svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg><span id="musicPauseLabel" class="music-sr">再生</span></button><button type="button" data-music-action="next" class="yt-icon-button" aria-label="次の曲" disabled><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 5v14M5 5l10 7-10 7z"/></svg></button><span id="musicTime" class="yt-time">--:-- / --:--</span></div>
+        <div class="yt-now"><div id="musicNowArt" class="yt-now-art" aria-hidden="true"><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 17V5l11-2v12M9 7l11-2"/><ellipse cx="6" cy="18" rx="3" ry="2"/><ellipse cx="17" cy="16" rx="3" ry="2"/></svg></div><div class="yt-now-copy"><h3 id="musicTitle">曲を選んで再生</h3><p id="musicArtist">音楽と再生先を選択してください</p><span id="musicPlayback" class="music-sr">再生先を選択してください</span></div></div>
+        <div class="yt-player-actions"><div class="yt-volume"><label for="musicVolume" aria-label="音量"><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="m11 5-5 4H3v6h3l5 4zM15 8c3 2 3 6 0 8M18 5c5 4 5 10 0 14"/></svg></label><input id="musicVolume" type="range" min="0" max="100" step="1" disabled><output id="musicVolumeValue" for="musicVolume">—</output></div><button type="button" id="musicDeviceToggleBottom" class="yt-icon-button" aria-label="再生先を選択" aria-controls="musicDevicePanel" aria-expanded="false"><svg class="" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8V4h18v16h-9M3 14a6 6 0 0 1 6 6M3 10a10 10 0 0 1 10 10"/><circle cx="3" cy="20" r="1"/></svg></button><button type="button" data-music-action="stop" class="yt-icon-button" aria-label="停止" disabled><svg class="" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1"/></svg></button></div>
+      </footer>
+    </div>
   </div>
 
   <!-- NIGHT -->
@@ -172,5 +238,8 @@
 
 <script src="/vendor/leaflet/leaflet.js"></script>
 <script src="/app.js"></script>
+<script src="/music-ambient.js"></script>
+<script src="/music.js"></script>
+<script src="/desktop.js"></script>
 </body>
 </html>

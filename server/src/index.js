@@ -5,12 +5,19 @@ import { config } from "./config.js";
 import { getSettings, saveSettings, DEFAULT_SETTINGS } from "./settings.js";
 import { startPolling, getState, subscribe, refreshAfterSettingsChange } from "./services/poller.js";
 import * as remo from "./clients/natureRemo.js";
+import { musicRoutes } from "./routes/music.js";
+import { desktopRoutes } from "./routes/desktop.js";
+import { VIEWER_DIR } from "./clients/desktop.js";
 import { checkAndMaybeUpdate, getUpdateStatus, latestRelease } from "./services/updater.js";
 
 const app = Fastify({ logger: { level: "info", transport: undefined } });
 
 // 静的ファイル（フロント）
 app.register(fastifyStatic, { root: config.webDir, prefix: "/" });
+app.register(musicRoutes);
+fs.mkdirSync(VIEWER_DIR, { recursive: true });
+app.register(fastifyStatic, { root: VIEWER_DIR, prefix: "/viewer/spacedesk/", decorateReply: false });
+app.register(desktopRoutes);
 
 // ---- API ----
 app.get("/api/state", async () => getState());
@@ -87,6 +94,8 @@ app.get("/api/health", async () => ({ ok: true, version: getUpdateStatus().curre
 
 // /settings で設定ページを返す
 app.get("/settings", (req, reply) => reply.sendFile("settings.html"));
+app.get("/music", (req, reply) => reply.sendFile("index.html"));
+app.get("/desktop", (req, reply) => reply.sendFile("index.html"));
 
 async function main() {
   fs.mkdirSync(config.dataDir, { recursive: true });

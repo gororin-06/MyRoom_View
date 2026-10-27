@@ -1,0 +1,91 @@
+body.music-saver { padding: 0; background: #050505; }
+.music-saver .stage { max-width: none; height: 100%; }
+.ambient.is-music > .slide, .ambient.is-music > .amb-foot { display: none; }
+.music-ambient { position: absolute; inset: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; overflow: hidden; background: #050505; color: #f4f4f4; padding: clamp(24px, 4vw, 64px); isolation: isolate; font-family: Arial, "Yu Gothic UI", sans-serif; }
+.ambient-music-backdrop { position: absolute; z-index: -3; inset: -15%; width: 130%; height: 130%; object-fit: cover; filter: blur(90px) saturate(.8); opacity: .3; pointer-events: none; }
+.ambient-music-shade { position: absolute; z-index: -2; inset: 0; background: linear-gradient(90deg, #0003, #0008 65%), linear-gradient(0deg, #000b, transparent 35%, transparent 70%, #0008); pointer-events: none; }
+.ambient-music-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 30px; }
+.ambient-music-brand { display: flex; align-items: center; gap: 10px; font-size: 26px; font-weight: 700; letter-spacing: -.04em; }
+.ambient-music-brand small { display: block; font-size: 8px; letter-spacing: .2em; color: #999; font-weight: 400; margin-top: 7px; }
+.ambient-music-logo { width: 34px; height: 34px; background: #ff0033; color: #fff; border-radius: 50%; font-size: 15px; display: grid; place-items: center; padding-left: 2px; }
+.ambient-music-clock { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+.ambient-music-clock time { font: 400 clamp(40px, 5.7vw, 88px)/.95 var(--f-disp); font-variant-numeric: tabular-nums; letter-spacing: -.04em; }
+.ambient-music-clock > span { font-size: clamp(12px, 1.3vw, 18px); color: #aaa; }
+.ambient-music-main { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); align-items: center; gap: clamp(38px, 6vw, 100px); width: min(1280px, 100%); margin: 0 auto; padding: 32px 0; min-height: 0; }
+.ambient-music-cover { width: min(100%, 48vh, 500px); aspect-ratio: 1; position: relative; justify-self: end; border-radius: 8px; overflow: hidden; box-shadow: 0 25px 80px #0008; background: #1b1b1b; }
+.ambient-music-cover > img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+.ambient-music-fallback { width: 100%; height: 100%; display: grid; place-items: center; background: radial-gradient(circle at 50% 45%, #303030, #121212); position: relative; }
+.ambient-music-fallback > div { width: 75%; aspect-ratio: 1; border-radius: 50%; background: repeating-radial-gradient(circle, #292929 0 3px, #333 3px 4px, #292929 4px 7px); position: absolute; }
+.ambient-music-fallback > span { width: 24%; aspect-ratio: 1; display: grid; place-items: center; background: #5b2630; color: #f5dbe0; border-radius: 50%; font-size: clamp(30px, 5vw, 70px); position: relative; }
+.ambient-music-cover.has-image .ambient-music-fallback { visibility: hidden; }
+.ambient-music-details { min-width: 0; }
+.ambient-music-playing { display: flex; align-items: center; gap: 12px; font-size: 11px; letter-spacing: .21em; color: #c3c3c3; }
+.ambient-music-bars { display: flex; align-items: flex-end; gap: 3px; height: 18px; color: #ff0033; }
+.ambient-music-bars i { width: 3px; height: 14px; background: currentColor; animation: ambient-equalizer 1.3s ease-in-out infinite alternate; transform-origin: bottom; }
+.ambient-music-bars i:nth-child(2) { height: 18px; animation-delay: -.8s; }
+.ambient-music-bars i:nth-child(3) { height: 10px; animation-delay: -.4s; }
+.ambient-music-bars i:nth-child(4) { height: 16px; animation-delay: -.2s; }
+@keyframes ambient-equalizer { from { transform: scaleY(.45); } to { transform: scaleY(1); } }
+.ambient-music-details h2 { font-size: clamp(28px, 4.3vw, 68px); font-weight: 700; letter-spacing: -.035em; margin: 23px 0 16px; line-height: 1.3; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+.ambient-music-details > p { font-size: clamp(17px, 2vw, 30px); line-height: 1.5; color: #b3b3b3; margin: 0; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.ambient-music-details > p:empty { display: none; }
+.ambient-music-device { display: flex; align-items: center; gap: 10px; margin-top: 28px; color: #999; font-size: clamp(12px, 1.2vw, 16px); }
+.ambient-music-device svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.5; flex: none; }
+.ambient-music-device span { white-space: nowrap; text-overflow: ellipsis; overflow: hidden; }
+.ambient-music-timeline { width: min(100%, 490px); margin-top: 38px; }
+#ambientMusicProgress { width: 100%; height: 3px; border: 0; appearance: none; background: #ffffff24; display: block; }
+#ambientMusicProgress::-webkit-progress-bar { background: #ffffff24; border-radius: 99px; }
+#ambientMusicProgress::-webkit-progress-value { background: #f03; border-radius: 99px; }
+#ambientMusicProgress::-moz-progress-bar { background: #f03; border-radius: 99px; }
+.ambient-music-timeline > div { display: flex; justify-content: space-between; margin-top: 12px; font: 400 12px var(--f-disp); color: #aaa; font-variant-numeric: tabular-nums; }
+.ambient-music-footer { display: flex; align-items: center; justify-content: space-between; gap: 20px; color: #999; font-size: 12px; padding-top: 20px; }
+.ambient-music-room { display: flex; align-items: center; gap: 16px; }
+.ambient-music-room > span:last-child:not(:empty) { border-left: 1px solid #ffffff2a; padding-left: 16px; }
+.ambient-music-hint { color: #bbb; }
+.ambient-music-hint > span { color: #f1f1f1; margin-right: 6px; }
+.music-night .ambient-music-backdrop { opacity: .12; }
+.music-night .ambient-music-cover { filter: brightness(.65); }
+.music-night .ambient-music-header, .music-night .ambient-music-details, .music-night .ambient-music-footer { opacity: .7; }
+@media(min-width: 1600px) { .ambient-music-cover { width: min(100%, 50vh, 560px); } }
+@media(max-height: 600px) and (min-width: 701px) {
+  .music-ambient { padding: 22px 36px; }
+  .ambient-music-clock time { font-size: 44px; }
+  .ambient-music-main { padding: 16px 0; }
+  .ambient-music-cover { width: min(100%, 48vh); }
+  .ambient-music-details h2 { font-size: 30px; margin-block: 14px 10px; -webkit-line-clamp: 2; }
+  .ambient-music-device { margin-top: 18px; }
+  .ambient-music-timeline { margin-top: 22px; }
+  .ambient-music-footer { padding-top: 10px; }
+}
+@media(max-width: 700px) {
+  .music-ambient { padding: 25px; }
+  .ambient-music-brand { font-size: 21px; }
+  .ambient-music-logo { width: 28px; height: 28px; font-size: 12px; }
+  .ambient-music-brand small { font-size: 7px; }
+  .ambient-music-clock { gap: 8px; }
+  .ambient-music-clock time { font-size: 39px; }
+  .ambient-music-clock > span { font-size: 10px; }
+  .ambient-music-main { grid-template-columns: minmax(0, 1fr); gap: 26px; padding: 30px 0; align-content: center; }
+  .ambient-music-cover { justify-self: center; width: min(65vw, 31vh, 320px); }
+  .ambient-music-details { text-align: center; }
+  .ambient-music-playing, .ambient-music-device { justify-content: center; }
+  .ambient-music-playing { font-size: 9px; gap: 9px; }
+  .ambient-music-details h2 { font-size: clamp(26px, 6.8vw, 39px); margin-block: 16px 9px; -webkit-line-clamp: 2; }
+  .ambient-music-details > p { font-size: 16px; }
+  .ambient-music-device { margin-top: 18px; font-size: 11px; }
+  .ambient-music-timeline { margin: 25px auto 0; max-width: 330px; }
+  .ambient-music-timeline > div { font-size: 11px; }
+  .ambient-music-footer { font-size: 10px; gap: 12px; }
+  .ambient-music-room { gap: 8px; }
+  .ambient-music-room > span:last-child:not(:empty) { padding-left: 8px; }
+  .ambient-music-hint { font-size: 9px; }
+}
+@media(max-width: 700px) and (max-height: 650px) {
+  .music-ambient { padding: 18px; }
+  .ambient-music-cover { width: min(42vw, 24vh); }
+  .ambient-music-main { padding: 18px 0; gap: 18px; }
+  .ambient-music-clock time { font-size: 32px; }
+  .ambient-music-details h2 { font-size: 23px; margin-block: 12px 6px; }
+  .ambient-music-device { margin-top: 12px; }
+  .ambient-music-timeline { margin-top: 16px; }
+}

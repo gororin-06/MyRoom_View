@@ -8,6 +8,8 @@
     "node": ">=20"
   },
   "scripts": {
+    "test": "node --test",
+    "setup:desktop-viewer": "node scripts/install-spacedesk-viewer.mjs",
     "start": "node server/src/index.js",
     "dev": "node --watch server/src/index.js",
     "fetch:geo": "bash scripts/fetch-geojson.sh"

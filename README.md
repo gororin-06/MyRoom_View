@@ -4,6 +4,11 @@
 
 ## できること
 
+  * デスクトップ拡張（spacedesk連携）：Windows PCの追加画面を表示VMで受信し、MyRoom Viewへ切り替え。[導入手順](docs/desktop.md)を参照。
+
+  * 音楽操作（Music Assistant連携）：曲・アルバム・プレイリスト検索、再生先選択、再生/一時停止・停止・前後の曲・音量。Windows PCでの再生は[音楽のセットアップ](docs/music.md)を参照。
+  * 音楽再生中の待機画面：大きなジャケット・曲名と、小さな時計を表示。停止時は通常のスライドショーへ復帰（設定で切替可）。
+
 - **室温・湿度・照度**の表示（Nature Remo）
 - **エアコン操作**（ON/OFF・設定温度・運転モード・風量）
 - **天気**（気象庁API・無料。地域は設定可）
@@ -56,6 +61,8 @@ npm run fetch:geo        # 千葉県の GeoJSON を取得
 | `AUTO_UPDATE` | 自動アップデートの有効/無効 |
 
 ## ドキュメント
+
+  * [音楽・YouTube Music・Windows再生PC](docs/music.md)
 
 - [セットアップ](docs/setup.md)
 - [Nature Remo トークン取得](docs/nature-remo.md)

@@ -17,10 +17,12 @@
   var settings = {};     // state.settings
   var localAc = null;    // 操作中のエアコン値（楽観的更新）
   var bootVersion = null; // 起動時のアプリ版。アップデート後に変わったら自動リロード
+  var ambientMusicActive = false;
 
   // ---------- data layer (SSE + poll fallback) ----------
   function applyState(s) {
     state = s || {}; settings = state.settings || {};
+    document.dispatchEvent(new CustomEvent("room-settings", { detail: settings }));
     // アップデート適用でサーバーが再起動しバージョンが変わったら、表示を自動リロード
     var v = state.update && state.update.current;
     if (v) {
@@ -57,7 +59,7 @@
 
   function renderRoomName() {
     var n = settings.roomName || "リビング";
-    ["roomName", "roomName2", "roomName3"].forEach(function (id) { if ($(id)) $(id).textContent = n; });
+    ["roomName", "roomName2", "roomName3", "roomNameMusic"].forEach(function (id) { if ($(id)) $(id).textContent = n; });
   }
 
   function renderWeather() {
@@ -79,6 +81,7 @@
   function renderRoom() {
     var r = state.room || {};
     var t = r.temperature;
+    $("ambientMusicRoom").textContent = [t != null ? t + "°C" : "", r.humidity != null ? r.humidity + "%" : ""].filter(Boolean).join(" / ");
     ["roomTempBig"].forEach(function () {});
     if ($("roomTempBig")) $("roomTempBig").innerHTML = (t != null ? t : "--") + '<span class="u">°C</span>';
     if ($("roomHum")) $("roomHum").textContent = (r.humidity != null ? r.humidity : "--") + "%";
@@ -315,6 +318,8 @@
     if ($("miniClock")) $("miniClock").textContent = hh + ":" + mm;
     if ($("nTime")) $("nTime").textContent = hh + ":" + mm;
     if ($("nDate")) $("nDate").textContent = dateStr;
+    $("ambientMusicTime").textContent = hh + ":" + mm;
+    $("ambientMusicDate").textContent = dateStr;
     var h = d.getHours();
     if ($("greet")) $("greet").textContent = h < 5 ? "おやすみなさい" : h < 11 ? "おはようございます" : h < 18 ? "こんにちは" : "こんばんは";
     checkNight();
@@ -348,22 +353,43 @@
     Array.prototype.forEach.call(dotsBox.children, function (d, i) { d.classList.toggle("on", i === cur); });
   }
   function go(n) { if (!order.length) return; cur = (n + order.length) % order.length; showCur(); }
-  function startSlides() { stopSlides(); if (order.length > 1) slideTimer = setInterval(function () { go(cur + 1); }, (settings.interval || 7) * 1000); }
+  function startSlides() {
+    stopSlides();
+    if (ambientMusicActive || $("dash").classList.contains("show") || $("night").classList.contains("show") || $("disaster").classList.contains("show")) return;
+    if (order.length > 1) slideTimer = setInterval(function () { go(cur + 1); }, (settings.interval || 7) * 1000);
+  }
   function stopSlides() { if (slideTimer) { clearInterval(slideTimer); slideTimer = null; } }
 
   // ---------- dashboard open/close ----------
   var dash = $("dash"), ambient = $("ambient"), idleTimer = null;
-  function openDash() { if ($("disaster").classList.contains("show")) return; dash.classList.add("show"); ambient.classList.add("amb-hide"); stopSlides(); resetIdle(); }
-  function closeDash() { dash.classList.remove("show"); ambient.classList.remove("amb-hide"); clearTimeout(idleTimer); setPage("home"); go(0); startSlides(); }
-  function resetIdle() { clearTimeout(idleTimer); idleTimer = setTimeout(function () { if (!$("urlsheet").classList.contains("show")) closeDash(); }, (settings.idle || 20) * 1000); }
-  ambient.addEventListener("click", openDash);
+  function syncMusicAmbient() { document.body.classList.toggle("music-saver", ambientMusicActive && !dash.classList.contains("show")); }
+  function openDash() { if ($("disaster").classList.contains("show")) return; dash.classList.add("show"); ambient.classList.add("amb-hide"); $("night").classList.remove("show"); syncMusicAmbient(); stopSlides(); resetIdle(); }
+  function closeDash() { dash.classList.remove("show"); ambient.classList.remove("amb-hide"); clearTimeout(idleTimer); setPage("home"); syncMusicAmbient(); go(0); startSlides(); }
+  function resetIdle() { clearTimeout(idleTimer); if (!$("pageDesktop").hidden) return; idleTimer = setTimeout(function () { if (!$("urlsheet").classList.contains("show")) closeDash(); }, (settings.idle || 20) * 1000); }
+  function openFromAmbient() { openDash(); if (ambientMusicActive) setPage("music"); }
+  ambient.addEventListener("click", openFromAmbient);
+  ambient.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openFromAmbient(); } });
+  document.addEventListener("music-ambient", function (e) {
+    ambientMusicActive = e.detail.active;
+    ambient.classList.toggle("is-music", ambientMusicActive);
+    ambient.setAttribute("aria-label", ambientMusicActive ? "音楽の操作画面を開く" : "操作画面を開く");
+    syncMusicAmbient(); checkNight();
+    if (ambientMusicActive) stopSlides(); else startSlides();
+  });
+  document.addEventListener("room-settings-request", function () { document.dispatchEvent(new CustomEvent("room-settings", { detail: settings })); });
   $("closeBtn").addEventListener("click", function (e) { e.stopPropagation(); closeDash(); });
   dash.addEventListener("pointerdown", resetIdle); dash.addEventListener("click", resetIdle);
+  dash.addEventListener("input", resetIdle); dash.addEventListener("keydown", resetIdle);
 
   var navBtns = document.querySelectorAll("#dashNav button");
   function setPage(p) {
     Array.prototype.forEach.call(navBtns, function (b) { b.setAttribute("aria-pressed", b.getAttribute("data-page") === p ? "true" : "false"); });
     $("pageHome").hidden = p !== "home"; $("pageServer").hidden = p !== "server";
+    $("pageMusic").hidden = p !== "music";
+    $("pageDesktop").hidden = p !== "desktop";
+    document.dispatchEvent(new CustomEvent("music-page", { detail: p === "music" }));
+    document.dispatchEvent(new CustomEvent("desktop-page", { detail: p === "desktop" }));
+    if (dash.classList.contains("show")) resetIdle();
   }
   Array.prototype.forEach.call(navBtns, function (b) { b.addEventListener("click", function (e) { e.stopPropagation(); setPage(this.getAttribute("data-page")); resetIdle(); }); });
 
@@ -376,7 +402,8 @@
   var night = $("night"), snoozeUntil = 0;
   function isNightHour() { var h = new Date().getHours(), a = settings.nightStart || 0, b = settings.nightEnd == null ? 6 : settings.nightEnd; return a < b ? (h >= a && h < b) : a > b ? (h >= a || h < b) : false; }
   function checkNight() {
-    var want = isNightHour() && Date.now() > snoozeUntil && !$("disaster").classList.contains("show");
+    ambient.classList.toggle("music-night", ambientMusicActive && isNightHour());
+    var want = !ambientMusicActive && isNightHour() && Date.now() > snoozeUntil && !dash.classList.contains("show") && !$("disaster").classList.contains("show");
     if (want === night.classList.contains("show")) return;
     if (want) { stopSlides(); dash.classList.remove("show"); ambient.classList.remove("amb-hide"); night.classList.add("show"); }
     else { night.classList.remove("show"); if (!dash.classList.contains("show")) startSlides(); }
@@ -405,7 +432,13 @@
     else if (ty && ty.active) showTyphoon(ty, wn);
     else showWarnings(wn);
   }
-  function openDz() { if (!disasterVisible) { disasterVisible = true; $("disaster").classList.add("show"); night.classList.remove("show"); dash.classList.remove("show"); stopSlides(); setTimeout(function () { if (dzMap) dzMap.invalidateSize(); }, 200); } }
+  function openDz() {
+    if (disasterVisible) return;
+    disasterVisible = true; $("disaster").classList.add("show"); night.classList.remove("show");
+    dash.classList.remove("show"); ambient.classList.remove("amb-hide");
+    setPage("home"); syncMusicAmbient(); stopSlides();
+    setTimeout(function () { if (dzMap) dzMap.invalidateSize(); }, 200);
+  }
   function hideDisaster() { disasterVisible = false; $("disaster").classList.remove("show"); startSlides(); }
   $("dzClose").addEventListener("click", hideDisaster);
 
@@ -485,4 +518,9 @@
   tick(); setInterval(tick, 1000);
   buildOrder(); startSlides();
   connect();
+  // Run after music.js has installed its page listener.
+  document.addEventListener("DOMContentLoaded", function () {
+    if (location.pathname === "/music") { openDash(); setPage("music"); }
+    if (location.pathname === "/desktop") { openDash(); setPage("desktop"); }
+  });
 })();

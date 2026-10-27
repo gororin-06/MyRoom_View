@@ -98,6 +98,7 @@
     $("weather").checked = s.weather !== false; $("room").checked = s.room !== false; $("server").checked = s.server !== false;
     $("nStart").value = s.nightStart || 0; $("nEnd").value = s.nightEnd == null ? 6 : s.nightEnd;
     $("autoUpdate").checked = s.autoUpdate !== false;
+    $("musicScreensaver").checked = s.musicScreensaver !== false;
     $("sub").textContent = location.host + " ・ 設定";
   }
 
@@ -112,6 +113,7 @@
   $("nStart").addEventListener("change", function () { save({ nightStart: +this.value }); });
   $("nEnd").addEventListener("change", function () { save({ nightEnd: +this.value }); });
   $("autoUpdate").addEventListener("change", function () { save({ autoUpdate: this.checked }); });
+  $("musicScreensaver").addEventListener("change", function () { save({ musicScreensaver: this.checked }); });
 
   // ---- self-monitored servers ----
   function renderServers() {

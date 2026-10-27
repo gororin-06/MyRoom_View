@@ -5,6 +5,7 @@ COPY package*.json ./
 RUN npm ci --omit=dev
 COPY server ./server
 COPY web ./web
+COPY scripts ./scripts
 EXPOSE 3000
 VOLUME ["/app/data"]
 CMD ["node", "server/src/index.js"]

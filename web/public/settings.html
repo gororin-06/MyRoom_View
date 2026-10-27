@@ -7,109 +7,138 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
-<style>
-  :root { --bg:#0b0e13; --card:#151a22; --card-2:#1b212b; --line:#262e3a; --fg:#eef2f7; --muted:#94a0b2; --faint:#5e6a7b; --accent:#3b9eff; --accent-soft:rgba(59,158,255,.18); --good:#22b07d; --warn:#e8a13a; --crit:#e2544e; --shadow:0 1px 2px rgba(0,0,0,.4),0 14px 40px rgba(0,0,0,.45); --f-disp:"Outfit",system-ui,sans-serif; --f-text:"Zen Kaku Gothic New",system-ui,sans-serif; color-scheme:dark; }
-  * { box-sizing:border-box; } body { margin:0; background:var(--bg); color:var(--fg); font-family:var(--f-text); -webkit-font-smoothing:antialiased; padding:0 max(16px,env(safe-area-inset-left,0)); }
-  .wrap { max-width:640px; margin:0 auto; padding:clamp(16px,4vw,32px) 0 56px; }
-  header.top { display:flex; align-items:center; gap:11px; margin-bottom:20px; }
-  .logo { width:42px; height:42px; border-radius:12px; background:var(--accent-soft); color:var(--accent); display:grid; place-items:center; font-size:20px; flex:none; }
-  .top h1 { margin:0; font-size:clamp(19px,5vw,23px); } .top .sub { font-size:12px; color:var(--muted); }
-  .card { background:var(--card); border:1px solid var(--line); border-radius:18px; box-shadow:var(--shadow); padding:clamp(16px,4vw,22px); margin-bottom:16px; }
-  .card > h2 { margin:0 0 4px; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); font-weight:700; } .card > .desc { font-size:13px; color:var(--faint); margin-bottom:8px; }
-  .row { display:flex; align-items:center; justify-content:space-between; gap:14px; padding:13px 0; border-top:1px solid var(--line); flex-wrap:wrap; } .row:first-of-type { border-top:none; }
-  .row .lab { font-size:15px; } .row .hint { font-size:12px; color:var(--faint); margin-top:2px; }
-  .sw { position:relative; width:52px; height:31px; flex:none; } .sw input { position:absolute; inset:0; opacity:0; margin:0; cursor:pointer; }
-  .sw .tr { position:absolute; inset:0; background:var(--card-2); border:1px solid var(--line); border-radius:99px; transition:.2s; } .sw .tr::after { content:""; position:absolute; top:3px; left:3px; width:23px; height:23px; border-radius:50%; background:var(--faint); transition:.2s; }
-  .sw input:checked + .tr { background:var(--accent-soft); border-color:var(--accent); } .sw input:checked + .tr::after { left:24px; background:var(--accent); }
-  .sw.small { width:46px; height:28px; } .sw.small .tr::after { width:20px; height:20px; } .sw.small input:checked + .tr::after { left:21px; }
-  select,input[type=text],input[type=number] { font-family:var(--f-text); font-size:15px; background:var(--card-2); color:var(--fg); border:1px solid var(--line); border-radius:11px; padding:11px 13px; } select { min-width:150px; }
-  .rng { display:flex; align-items:center; gap:12px; } .rng input[type=range] { accent-color:var(--accent); width:clamp(120px,40vw,180px); } .rng .val { font:600 15px/1 var(--f-disp); font-variant-numeric:tabular-nums; min-width:46px; text-align:right; }
-  .night-rng { display:flex; align-items:center; gap:8px; } .night-rng input { width:68px; text-align:center; } .night-rng span { color:var(--muted); font-size:14px; }
-  .srv { border:1px solid var(--line); border-radius:15px; padding:14px; margin-top:12px; background:var(--card-2); }
-  .srv .sh { display:flex; align-items:center; gap:8px; margin-bottom:10px; } .srv .sh .dot { width:9px; height:9px; border-radius:50%; background:var(--good); flex:none; } .srv.down .sh .dot { background:var(--crit); }
-  .srv .sh .nm { flex:1; font-weight:700; font-size:15px; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .srv .del { border:1px solid var(--line); background:var(--card); color:var(--crit); border-radius:10px; width:40px; height:40px; flex:none; cursor:pointer; font-size:15px; }
-  .srv .sh-btns { display:flex; gap:6px; flex:none; }
-  .srv .mv { border:1px solid var(--line); background:var(--card); color:var(--fg); border-radius:10px; width:40px; height:40px; cursor:pointer; font-size:15px; } .srv .mv:disabled { opacity:.3; cursor:default; }
-  .field { display:flex; flex-direction:column; gap:5px; margin-top:10px; } .field > label { font-size:12px; color:var(--muted); } .field input { width:100%; }
-  .svc-wrap { margin-top:12px; } .svc-lab { font-size:12px; color:var(--muted); display:block; margin-bottom:8px; }
-  .svc-list { display:flex; flex-direction:column; gap:8px; } .svc-row { display:flex; align-items:center; gap:8px; }
-  .svc-row .d { width:9px; height:9px; border-radius:50%; background:var(--good); flex:none; } .svc-row.down .d { background:var(--crit); }
-  .svc-row input[data-sf=n] { flex:1; min-width:0; } .svc-row input[data-sf=p] { flex:1.4; min-width:0; } .svc-row .colon { color:var(--muted); }
-  .svc-row .svc-del { border:1px solid var(--line); background:var(--card); color:var(--crit); border-radius:10px; width:40px; height:40px; flex:none; cursor:pointer; font-size:14px; }
-  .svc-row .svc-mv { border:1px solid var(--line); background:var(--card); color:var(--fg); border-radius:10px; width:38px; height:40px; flex:none; cursor:pointer; font-size:14px; } .svc-row .svc-mv:disabled { opacity:.3; cursor:default; }
-  .ord-wrap { margin-top:14px; } .ord-wrap .hint { margin-bottom:8px; }
-  .ord-list { display:flex; flex-direction:column; gap:8px; }
-  .ord-row { display:flex; align-items:center; gap:10px; background:var(--card-2); border:1px solid var(--line); border-radius:11px; padding:10px 12px; }
-  .ord-row .ord-n { width:22px; height:22px; flex:none; display:flex; align-items:center; justify-content:center; border-radius:50%; background:var(--line); font:600 12px/1 var(--f-disp); }
-  .ord-row .ord-name { flex:1; font-weight:600; font-size:15px; }
-  .ord-row .ord-btns { display:flex; gap:6px; } .ord-row .ord-btns button { border:1px solid var(--line); background:var(--card); color:var(--fg); border-radius:9px; width:40px; height:40px; cursor:pointer; font-size:16px; }
-  .ord-row .ord-btns button:disabled { opacity:.3; cursor:default; }
-  .add { width:100%; border:1px dashed var(--line); background:var(--card); color:var(--muted); border-radius:13px; padding:14px; font-family:var(--f-text); font-weight:700; font-size:14px; cursor:pointer; margin-top:12px; }
-  .hinfo { flex:1; min-width:0; display:flex; flex-direction:column; } .hinfo .nm { font-weight:700; font-size:15px; } .hinfo .hhost { font-size:12px; color:var(--faint); font-family:var(--f-disp); }
-  .foot { text-align:center; color:var(--faint); font-size:12px; margin-top:10px; line-height:1.6; }
-  .toast { position:fixed; left:50%; bottom:calc(22px + env(safe-area-inset-bottom,0)); transform:translateX(-50%) translateY(20px); background:var(--fg); color:var(--bg); font-weight:600; font-size:14px; padding:11px 20px; border-radius:99px; box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:opacity .25s,transform .25s; } .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
-</style>
+<link rel="stylesheet" href="/settings.css">
+<link rel="stylesheet" href="/theme.css">
+<link rel="stylesheet" href="/music.css">
+<link rel="stylesheet" href="/settings-layout.css">
+<link rel="stylesheet" href="/desktop.css">
 </head>
-<body>
-<div class="wrap">
-  <header class="top"><div class="logo">⚙</div><div><h1>MyRoom View 設定</h1><div class="sub" id="sub">スマホ / PC から設定</div></div></header>
+<body class="settings-body">
+<aside class="settings-sidebar">
+  <a class="app-brand" href="/" aria-label="MyRoom Viewの本体画面へ"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>myroom<span class="brand-dot">.</span><small>YOUR HOME, AT A GLANCE</small></span></a>
+  <span class="sidebar-caption">設定</span>
+  <nav class="settings-nav" aria-label="設定カテゴリ">
+    <a href="#music" data-settings-tab="music" aria-current="page"><span aria-hidden="true">♫</span>音楽と再生先</a>
+    <a href="#display" data-settings-tab="display"><span aria-hidden="true">◫</span>画面と表示</a>
+    <a href="#desktop" data-settings-tab="desktop"><span aria-hidden="true">▣</span>デスクトップ拡張</a>
+    <a href="#room" data-settings-tab="room"><span aria-hidden="true">⌂</span>部屋と地域</a>
+    <a href="#servers" data-settings-tab="servers"><span aria-hidden="true">▤</span>サーバー監視</a>
+    <a href="#devices" data-settings-tab="devices"><span aria-hidden="true">⌘</span>デバイス連携</a>
+    <a href="#updates" data-settings-tab="updates"><span aria-hidden="true">↻</span>アップデート</a>
+  </nav>
+  <div class="sidebar-bottom"><a href="/">← 本体画面に戻る</a><span>MyRoom View <span id="sidebarVersion"></span></span></div>
+</aside>
+<div class="wrap settings-main">
+  <header class="settings-topbar"><div class="settings-breadcrumb">MyRoom View <span>/</span> 設定 <span>/</span> <b id="settingsBreadcrumb">音楽と再生先</b></div><a class="local-badge settings-home-link" href="/">本体画面へ ↗</a></header>
+  <div class="settings-heading"><div><p class="eyebrow">MAKE YOURSELF AT HOME</p><h1 id="settingsTitle">音楽と再生先</h1><p id="settingsDescription">お気に入りの音楽を、お部屋のスピーカーへ。</p></div><div class="sub" id="sub">スマホ / PC から設定</div></div>
 
-  <section class="card">
-    <h2>基本</h2>
-    <div class="row"><div><div class="lab">部屋の名前</div></div><input type="text" id="roomName" style="min-width:160px"></div>
-    <div class="row"><div><div class="lab">天気の地域</div><div class="hint">気象庁API（無料）から取得</div></div>
-      <select id="region"><option>北海道（札幌）</option><option>千葉県</option><option>東京都</option><option>愛知県（名古屋）</option><option>大阪府</option><option>福岡県</option><option>沖縄県（那覇）</option></select></div>
+  <section class="card settings-group desktop-settings" data-settings-group="desktop" hidden>
+    <h2>デスクトップPCの拡張画面</h2>
+    <p>表示用Ubuntu VMのブラウザーを、Windows PCの追加ディスプレイとして使います。Windows側にはspacedesk DRIVERを導入してください。</p>
+    <form id="desktopConfigForm">
+      <div class="row"><div><label class="lab" for="desktopEnabled">拡張ディスプレイを使う</label></div><label class="sw"><input id="desktopEnabled" type="checkbox" aria-label="拡張ディスプレイを有効にする"><span class="tr"></span></label></div>
+      <div id="desktopTargets"></div>
+      <button id="desktopAdd" type="button">＋ 別のWindows PCを追加</button>
+      <p>Ubuntu VMではなく、拡張元PCのIPv4アドレスを登録します。PCを複数登録し、拡張画面で1台ずつ選択できます。接続確認は「標準の接続先」が対象です。</p>
+      <p id="desktopViewerInstalled">ビューアーの導入状態を確認中…</p>
+      <div class="desktop-settings-actions"><button id="desktopSave" type="submit" disabled>保存</button><button id="desktopCheck" type="button" disabled>保存して接続確認</button><a href="/desktop" class="text-link">拡張画面を開く ↗</a></div>
+    </form>
+    <p id="desktopSettingsStatus" role="status" aria-live="polite">設定を読み込み中…</p>
+  </section>
+  <section class="card settings-group desktop-settings" data-settings-group="desktop" hidden>
+    <h2>セットアップの順序</h2>
+    <ol class="desktop-setup-list"><li>拡張元のWindows PCに、<a href="https://www.spacedesk.net/download/" target="_blank" rel="noopener noreferrer">公式spacedesk DRIVER</a>を導入し、有効にします。</li><li>MyRoom Viewのサーバーで <code>npm run setup:desktop-viewer</code> を実行します。このサーバーへの導入状態は上の欄で確認できます。</li><li>PCのIPアドレスを保存し、「拡張画面を開く」を押して接続します。</li><li>Windowsの「設定 → システム → ディスプレイ」で「表示画面を拡張する」を選び、画面の配置を調整します。</li></ol>
+    <p>MyRoom Viewへの切り替えは上部の「MyRoomへ戻る」で行えます。拡張画面を開いている間は、無操作によるスクリーンセーバーへの切り替えを止めます。</p>
+    <p>HTML5ビューアーの同時接続は、Windows PC 1台につき1接続です。別のタブ・端末で開いている場合は、先にそちらを閉じてください。Ubuntu VMとWindows PCは同じ家庭内LANに接続してください。</p>
+    <a href="https://manual.spacedesk.net/RunonanyMachineinHTML5Webbrowser.html" target="_blank" rel="noopener noreferrer">公式HTML5ビューアーの説明 ↗</a>
   </section>
 
-  <section class="card">
+  <section class="card settings-group" data-settings-group="room" hidden>
+    <h2>基本</h2>
+    <div class="row"><div><div class="lab">部屋の名前</div></div><input type="text" id="roomName" aria-label="部屋の名前" style="min-width:160px"></div>
+    <div class="row"><div><div class="lab">天気の地域</div><div class="hint">気象庁API（無料）から取得</div></div>
+      <select id="region" aria-label="天気の地域"><option>北海道（札幌）</option><option>千葉県</option><option>東京都</option><option>愛知県（名古屋）</option><option>大阪府</option><option>福岡県</option><option>沖縄県（那覇）</option></select></div>
+  </section>
+
+  <section class="card settings-group" data-settings-group="display" hidden>
     <h2>スライドショー</h2>
-    <div class="row"><div><div class="lab">切替速度</div><div class="hint">各スライドを表示する秒数</div></div><div class="rng"><input type="range" id="interval" min="3" max="20" step="1"><span class="val" id="intervalV">7秒</span></div></div>
-    <div class="row"><div class="lab">天気を表示</div><label class="sw"><input type="checkbox" id="weather"><span class="tr"></span></label></div>
-    <div class="row"><div class="lab">室内環境を表示</div><label class="sw"><input type="checkbox" id="room"><span class="tr"></span></label></div>
-    <div class="row"><div class="lab">自宅サーバーを表示</div><label class="sw"><input type="checkbox" id="server"><span class="tr"></span></label></div>
+    <div class="row"><div><div class="lab">切替速度</div><div class="hint">各スライドを表示する秒数</div></div><div class="rng"><input type="range" id="interval" aria-label="スライドの切替速度" min="3" max="20" step="1"><span class="val" id="intervalV">7秒</span></div></div>
+    <div class="row"><div class="lab">天気を表示</div><label class="sw"><input type="checkbox" id="weather" aria-label="天気を表示"><span class="tr"></span></label></div>
+    <div class="row"><div class="lab">室内環境を表示</div><label class="sw"><input type="checkbox" id="room" aria-label="室内環境を表示"><span class="tr"></span></label></div>
+    <div class="row"><div class="lab">自宅サーバーを表示</div><label class="sw"><input type="checkbox" id="server" aria-label="自宅サーバーを表示"><span class="tr"></span></label></div>
     <div class="ord-wrap"><div class="lab">表示順</div><div class="hint">スライドの並び順（↑↓で入れ替え）。非表示の項目も並べられます。</div><div id="slideOrder" class="ord-list"></div></div>
   </section>
 
-  <section class="card">
+  <section class="card settings-group" data-settings-group="servers" hidden>
     <h2>自宅サーバー ・ 監視サービス（自前チェック）</h2>
     <div class="desc">ノードのCPU/メモリ等は Zabbix（.env で接続）から取得。ここでは各サービスを「名前＋ポート」で登録すると、指定ポートを自前でTCPチェックして死活・Ping・稼働率を表示します。</div>
     <div id="srvList"></div>
     <button class="add" id="srvAdd">＋ サーバーを追加</button>
   </section>
 
-  <section class="card">
+  <section class="card settings-group" data-settings-group="devices" hidden>
     <h2>プロジェクター連動（照明オフ）</h2>
     <div class="desc">指定した監視サービスが「起動（疎通OFF→ON）」した時、照明がONなら確認ポップアップを表示し、OKまたは一定秒数で消灯します。</div>
-    <div class="row"><div class="lab">有効</div><label class="sw"><input type="checkbox" id="projEnabled"><span class="tr"></span></label></div>
-    <div class="row"><div><div class="lab">プロジェクターの接続先</div><div class="hint">IP:ポート（GoogleTVなら 8008 など、起動で開くポート）。サーバー一覧には表示されません</div></div><input type="text" id="projAddr" placeholder="192.168.0.50:8008" style="min-width:200px"></div>
-    <div class="row"><div><div class="lab">消す照明</div><div class="hint">Nature Remo の照明</div></div><select id="projLight"><option value="">—</option></select></div>
-    <div class="row"><div><div class="lab">確認の秒数</div><div class="hint">この秒数で自動的に消灯</div></div><input type="number" id="projSeconds" min="3" max="60" style="width:80px"></div>
+    <div class="row"><div class="lab">有効</div><label class="sw"><input type="checkbox" id="projEnabled" aria-label="プロジェクター連動を有効にする"><span class="tr"></span></label></div>
+    <div class="row"><div><div class="lab">プロジェクターの接続先</div><div class="hint">IP:ポート（GoogleTVなら 8008 など、起動で開くポート）。サーバー一覧には表示されません</div></div><input type="text" id="projAddr" aria-label="プロジェクターの接続先" placeholder="192.168.0.50:8008" style="min-width:200px"></div>
+    <div class="row"><div><div class="lab">消す照明</div><div class="hint">Nature Remo の照明</div></div><select id="projLight" aria-label="消す照明"><option value="">—</option></select></div>
+    <div class="row"><div><div class="lab">確認の秒数</div><div class="hint">この秒数で自動的に消灯</div></div><input type="number" id="projSeconds" aria-label="確認の秒数" min="3" max="60" style="width:80px"></div>
   </section>
 
-  <section class="card">
+  <section class="card settings-group" data-settings-group="servers" hidden>
     <h2>Zabbix ホスト（表示切替）</h2>
     <div class="desc">Zabbix から取得したノード。表示のオン/オフを切り替えられます。</div>
     <div id="nodeList"><div class="desc">Zabbix 未接続、または取得中…</div></div>
   </section>
 
-  <section class="card">
+  <section class="card settings-group" data-settings-group="display" hidden>
     <h2>画面</h2>
-    <div class="row"><div><div class="lab">操作後に戻るまで</div><div class="hint">無操作でスライドショーへ戻る秒数</div></div><div class="rng"><input type="range" id="idle" min="10" max="120" step="5"><span class="val" id="idleV">20秒</span></div></div>
-    <div class="row"><div><div class="lab">深夜モード</div><div class="hint">この時間帯は時計のみを暗く表示</div></div><div class="night-rng"><input type="number" id="nStart" min="0" max="23"><span>時 〜</span><input type="number" id="nEnd" min="0" max="23"><span>時</span></div></div>
+    <div class="row"><div><label class="lab" for="musicScreensaver">音楽再生中のスクリーンセーバー</label><div class="hint">ジャケット・曲名を大きく、時計を小さく表示します。停止すると通常の表示に戻ります。</div></div><label class="sw"><input type="checkbox" id="musicScreensaver" aria-label="音楽再生中は楽曲中心の表示にする"><span class="tr"></span></label></div>
+    <div class="row"><div><div class="lab">操作後に戻るまで</div><div class="hint">無操作でスライドショーへ戻る秒数</div></div><div class="rng"><input type="range" id="idle" aria-label="操作後に戻るまでの秒数" min="10" max="120" step="5"><span class="val" id="idleV">20秒</span></div></div>
+    <div class="row"><div><div class="lab">深夜モード</div><div class="hint">この時間帯は時計のみを暗く表示</div></div><div class="night-rng"><input type="number" id="nStart" aria-label="深夜モードの開始時刻" min="0" max="23"><span>時 〜</span><input type="number" id="nEnd" aria-label="深夜モードの終了時刻" min="0" max="23"><span>時</span></div></div>
   </section>
 
-  <section class="card">
+  <section class="card settings-group" data-settings-group="updates" hidden>
     <h2>アップデート</h2>
     <div class="desc">GitHub に新しいリリースが出たら自動でダウンロード・展開します。</div>
     <div class="row"><div><div class="lab">現在のバージョン</div><div class="hint" id="updHint">確認中…</div></div><span style="font-family:var(--f-disp);font-weight:700;font-size:16px" id="curVer">—</span></div>
-    <div class="row"><div><div class="lab">自動アップデート</div></div><label class="sw"><input type="checkbox" id="autoUpdate"><span class="tr"></span></label></div>
+    <div class="row"><div><div class="lab">自動アップデート</div></div><label class="sw"><input type="checkbox" id="autoUpdate" aria-label="自動アップデート"><span class="tr"></span></label></div>
     <div class="row"><div><div class="lab">今すぐ確認</div></div><button class="add" id="updCheck" style="width:auto;margin:0;padding:10px 16px">確認する</button></div>
   </section>
 
-  <div class="foot">変更は自動保存されます。<br>MyRoom View ・ 設定（別端末向け）</div>
+  <section class="settings-group music-settings-group" data-settings-group="music">
+    <div class="music-setup-banner">
+      <div class="setup-banner-icon" aria-hidden="true">♫</div>
+      <div><span class="eyebrow">YOUR MUSIC, YOUR SPACE</span><h2>いつもの音楽を、好きな場所で。</h2><p>MyRoom Viewで選曲して、Windows PCにつないだスピーカーで再生。</p></div>
+      <span class="service-chip">YouTube Music 対応</span>
+    </div>
+    <div class="settings-music-grid">
+      <section class="card music music-config">
+        <div class="config-card-heading"><div><p class="eyebrow">CONNECTION</p><h2>Music Assistantに接続</h2></div><span class="connection-badge" id="maConnectionBadge" data-state="idle"><i></i><span>未接続</span></span></div>
+        <p class="config-intro">音楽を管理するサーバーと、この画面をつなぎます。</p>
+        <form id="musicConfigForm">
+          <label class="config-enable"><span><strong>音楽機能を使う</strong><small>本体画面から選曲・再生先の操作を有効にします</small></span><span class="sw"><input type="checkbox" id="maEnabled"><span class="tr"></span></span></label>
+          <div class="config-field"><label for="maUrl">サーバーのURL <span class="field-required">必須</span></label><p class="field-hint">Music Assistantを開くときのアドレス</p><input id="maUrl" type="url" placeholder="http://192.168.1.20:8095" maxlength="2048" spellcheck="false"><span class="field-example">例： http://192.168.1.20:8095</span></div>
+          <div class="config-field"><label for="maToken">アクセストークン <span class="field-required">必須</span></label><p class="field-hint">Music Assistantのプロフィールで作成した長期トークン</p><div class="token-input"><input id="maToken" type="password" autocomplete="new-password" maxlength="8192" placeholder="トークンを貼り付け" spellcheck="false"><button type="button" id="maRevealToken" aria-pressed="false" aria-label="トークンを表示">表示</button></div><span class="field-example">登録後は空欄のままで保持できます。</span></div>
+          <div class="config-field"><label for="maDefaultPlayer">いつもの再生先</label><p class="field-hint">本体の音楽画面で最初に選択するデバイス</p><select id="maDefaultPlayer"><option value="">接続後に選択できます</option></select></div>
+          <details class="config-advanced"><summary>トークンの管理</summary><p>接続先URLを変更するときは、新しい接続先のトークンを再入力してください。</p><label><input type="checkbox" id="maClearToken"> 登録済みトークンを削除する</label></details>
+          <div class="config-save-bar"><span id="maDirty" class="save-indicator">変更を保存できます</span><div class="music-buttons"><button id="maSave" type="submit">保存</button><button id="maTest" type="button" class="button-primary">保存して接続確認 <span aria-hidden="true">↗</span></button></div></div>
+        </form>
+        <p id="maStatus" class="config-status" role="status" aria-live="polite">設定を読み込み中…</p>
+      </section>
+      <aside class="setup-guide">
+        <section class="card"><p class="eyebrow">GETTING STARTED</p><h2>再生までの3ステップ</h2><ol class="setup-steps"><li><span class="step-number">01</span><div><h3>音楽サーバーを用意</h3><p>Proxmox内のVMにMusic Assistantを導入します。</p><span class="step-state" id="maGuideServer">接続待ち</span></div></li><li><span class="step-number">02</span><div><h3>Windows PCをつなぐ</h3><p>公式アプリを起動し、スピーカーの出力先を選びます。</p><span class="step-state" id="maPlayerCount">再生先は未確認</span></div></li><li><span class="step-number">03</span><div><h3>お気に入りを再生</h3><p>本体画面の「音楽」から、曲と再生先を選びます。</p><a class="text-link" href="/">本体画面を開く <span aria-hidden="true">↗</span></a></div></li></ol></section>
+        <section class="card premium-note"><span class="premium-icon" aria-hidden="true">♫</span><h2>Premiumについて</h2><p><strong>YouTube Music Premium</strong>、または<strong>YouTube Premium</strong>の契約で利用できます。</p><p>YouTube MusicのアカウントはMusic Assistant側で登録します。認証の更新が必要になる場合があります。</p><a class="text-link" href="https://www.music-assistant.io/music-providers/youtube-music/" target="_blank" rel="noopener noreferrer">連携のセットアップ手順 ↗</a></section>
+      </aside>
+    </div>
+  </section>
+
+  <div class="foot">音楽以外の変更は自動保存されます。<br>MyRoom View ・ 設定（別端末向け）</div>
 </div>
 <div class="toast" id="toast">保存しました</div>
 <script src="/settings.js"></script>
+<script src="/music-settings.js"></script>
+<script src="/settings-layout.js"></script>
+<script src="/desktop-settings.js"></script>
 </body>
 </html>

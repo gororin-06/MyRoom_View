@@ -47,6 +47,7 @@ function publicSettings() {
     roomName: s.roomName, interval: s.interval, idle: s.idle,
     weather: s.weather, room: s.room, server: s.server, region: s.region,
     nightStart: s.nightStart, nightEnd: s.nightEnd, autoUpdate: s.autoUpdate,
+    musicScreensaver: s.musicScreensaver,
   };
 }
 

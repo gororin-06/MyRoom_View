@@ -1,0 +1,57 @@
+.desktop-page { min-height: 0; gap: 12px; }
+.desktop-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.desktop-toolbar .eyebrow { font-size: 9px; margin-bottom: 5px; color: var(--accent); }
+.desktop-toolbar h2 { margin: 0; font-size: 22px; font-weight: 500; }
+.desktop-toolbar-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.desktop-target-select { display: flex; align-items: center; gap: 10px; margin-left: auto; color: var(--muted); font-size: 12px; }
+.desktop-target-select select { font: inherit; padding: 11px 12px; border: 1px solid var(--line); border-radius: 10px; color: var(--fg); background: var(--panel); min-height: 44px; max-width: 270px; }
+.desktop-pc-card { border: 1px solid var(--line); background: var(--card-2); padding: 18px; border-radius: 12px; margin: 18px 0; }
+.desktop-pc-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.desktop-settings .desktop-pc-heading > label { display: flex; gap: 9px; align-items: center; margin: 0; }
+.desktop-pc-heading input[type=radio] { min-height: 0; accent-color: var(--accent); }
+.desktop-pc-heading button { background: transparent; font-size: 11px; min-height: 36px; padding: 7px 11px; }
+.desktop-pc-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.desktop-pc-fields .desktop-field { margin-bottom: 0; }
+.desktop-page button, .desktop-settings button { border: 1px solid var(--line); background: var(--panel-2); border-radius: 10px; padding: 12px 16px; font: inherit; font-size: 12px; min-height: 44px; cursor: pointer; color: var(--fg); }
+.desktop-page button:disabled { opacity: .4; cursor: default; }
+#desktopStatus { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.desktop-error { color: var(--crit) !important; }
+.desktop-welcome { display: flex; flex: 1; min-height: 0; overflow-y: auto; flex-direction: column; align-items: center; justify-content: center; border: 1px solid var(--line); border-radius: 18px; padding: 30px; background: var(--panel); text-align: center; }
+.desktop-welcome > h2 { font-size: clamp(22px, 3vw, 34px); font-weight: 500; margin: 25px 0 8px; }
+.desktop-welcome > p { color: var(--muted); font-size: 13px; line-height: 1.8; }
+.desktop-page .desktop-primary { background: var(--accent); color: #15251a; font-weight: 700; margin: 16px 0; padding: 14px 24px; }
+.desktop-welcome > a { font-size: 12px; color: var(--muted); text-underline-offset: 4px; }
+.desktop-welcome .desktop-small { font-size: 11px; max-width: 450px; margin-top: 22px; }
+.desktop-monitor-art { width: 310px; max-width: 90%; height: 125px; position: relative; flex: none; }
+.desktop-monitor-art > div { width: 185px; height: 110px; border: 2px solid #718c75; border-radius: 7px; position: absolute; display: grid; place-items: center; background: #1c2c21; }
+.desktop-monitor-art > div::after { content: ''; position: absolute; width: 48px; height: 10px; border-bottom: 2px solid #718c75; bottom: -14px; }
+.desktop-monitor-primary { left: 0; top: 0; }
+.desktop-monitor-secondary { right: 0; top: 22px; z-index: 1; border-color: var(--accent) !important; background: #293b2e !important; }
+.desktop-monitor-art span { font: 500 9px var(--f-disp); color: var(--accent); letter-spacing: .12em; }
+.desktop-monitor-plus { position: absolute; right: -5px; top: 0; font-size: 24px !important; }
+#desktopViewer { width: 100%; flex: 1; min-height: 0; border: 1px solid var(--line); border-radius: 10px; background: #000; }
+.desktop-settings .desktop-field { margin: 20px 0; }
+.desktop-settings label { display: block; margin-bottom: 9px; font-size: 13px; }
+.desktop-settings input[type=text] { width: 100%; min-width: 0; }
+.desktop-settings p { color: var(--muted); font-size: 12px; line-height: 1.8; }
+.desktop-settings .desktop-settings-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+.desktop-setup-list { padding-left: 20px; line-height: 1.9; color: var(--muted); font-size: 13px; }
+.desktop-setup-list li { margin-bottom: 12px; }
+.desktop-settings a { color: var(--accent); text-underline-offset: 4px; }
+.desktop-settings code { font-size: 12px; overflow-wrap: anywhere; }
+@media(max-width: 760px) {
+  .dash-nav { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .dash-nav button { font-size: 11px; padding-inline: 3px; }
+  .nav-icon { margin-right: 3px; }
+  .desktop-toolbar { flex-wrap: wrap; gap: 12px; }
+  .desktop-toolbar h2 { font-size: 19px; }
+  .desktop-toolbar-actions { width: 100%; }
+  .desktop-target-select { margin-left: 0; width: 100%; }
+  .desktop-target-select select { flex: 1; min-width: 0; max-width: none; }
+  .desktop-pc-fields { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .desktop-toolbar-actions button { flex: 1; padding-inline: 10px; font-size: 11px; }
+  .desktop-welcome { padding: 24px 16px; justify-content: flex-start; }
+  .desktop-monitor-art { margin-top: 15px; width: 250px; }
+  .desktop-monitor-art > div { width: 155px; height: 95px; }
+  .desktop-welcome > p { font-size: 12px; }
+}
