@@ -176,6 +176,9 @@ body {
 .dz-body { flex: 1; min-height: 0; display: grid; grid-template-columns: 1.3fr .7fr; gap: 14px; margin-top: 14px; }
 @media (max-width: 820px) { .dz-body { grid-template-columns: 1fr; } }
 #dzmap { width: 100%; height: 100%; min-height: 320px; border-radius: 16px; border: 1px solid var(--line); background: var(--panel-2); }
+.dz-live { width: 100%; height: 100%; min-height: 320px; border-radius: 16px; overflow: hidden; border: 1px solid var(--line); background: #000; }
+.dz-live[hidden] { display: none; }
+.dz-live iframe { width: 100%; height: 100%; border: 0; display: block; }
 .dz-side { display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
 .dz-card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 16px; box-shadow: var(--shadow); }
 .dz-card h3 { margin: 0 0 10px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 700; }

@@ -58,6 +58,9 @@
     <div class="row"><div><div class="lab">部屋の名前</div></div><input type="text" id="roomName" aria-label="部屋の名前" style="min-width:160px"></div>
     <div class="row"><div><div class="lab">天気の地域</div><div class="hint">気象庁API（無料）から取得</div></div>
       <select id="region" aria-label="天気の地域"><option>北海道（札幌）</option><option>千葉県</option><option>東京都</option><option>愛知県（名古屋）</option><option>大阪府</option><option>福岡県</option><option>沖縄県（那覇）</option></select></div>
+    <div class="row"><div><div class="lab">地震ライブ配信</div><div class="hint">指定震度以上の地震で、地図の代わりにこの配信（NHK等）を表示。空欄で無効</div></div><input type="text" id="quakeLiveUrl" aria-label="地震ライブ配信のURL" placeholder="https://www.youtube.com/live/..." style="min-width:220px"></div>
+    <div class="row"><div><div class="lab">配信に切替える震度</div><div class="hint">この震度以上で配信表示に切替</div></div>
+      <select id="quakeLiveMinIntensity" aria-label="配信に切替える震度"><option value="4">震度4</option><option value="5-">震度5弱</option><option value="5+">震度5強</option><option value="6-">震度6弱</option><option value="6+">震度6強</option><option value="7">震度7</option></select></div>
   </section>
 
   <section class="card settings-group" data-settings-group="display" hidden>

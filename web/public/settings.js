@@ -99,12 +99,16 @@
     $("nStart").value = s.nightStart || 0; $("nEnd").value = s.nightEnd == null ? 6 : s.nightEnd;
     $("autoUpdate").checked = s.autoUpdate !== false;
     $("musicScreensaver").checked = s.musicScreensaver !== false;
+    if ($("quakeLiveUrl")) $("quakeLiveUrl").value = s.quakeLiveUrl || "";
+    if ($("quakeLiveMinIntensity")) $("quakeLiveMinIntensity").value = s.quakeLiveMinIntensity || "5-";
     $("sub").textContent = location.host + " ・ 設定";
   }
 
   // ---- simple bindings ----
   $("roomName").addEventListener("change", function () { save({ roomName: this.value }); });
   $("region").addEventListener("change", function () { save({ region: this.value }); });
+  if ($("quakeLiveUrl")) $("quakeLiveUrl").addEventListener("change", function () { save({ quakeLiveUrl: this.value.trim() }); });
+  if ($("quakeLiveMinIntensity")) $("quakeLiveMinIntensity").addEventListener("change", function () { save({ quakeLiveMinIntensity: this.value }); });
   $("interval").addEventListener("input", function () { $("intervalV").textContent = this.value + "秒"; }); $("interval").addEventListener("change", function () { save({ interval: +this.value }); });
   $("idle").addEventListener("input", function () { $("idleV").textContent = this.value + "秒"; }); $("idle").addEventListener("change", function () { save({ idle: +this.value }); });
   $("weather").addEventListener("change", function () { save({ weather: this.checked }); });

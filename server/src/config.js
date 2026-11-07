@@ -35,6 +35,8 @@ export const config = {
     areaCode: process.env.JMA_AREA_CODE || "120000",
     quakeWatchCities: (process.env.QUAKE_WATCH_CITIES || "市原市,千葉市").split(",").map((s) => s.trim()).filter(Boolean),
     quakeMinIntensity: process.env.QUAKE_MIN_INTENSITY || "3",
+    // この震度以上なら対象地域に関わらず全国どこの地震でも表示する（大地震は必ず知らせる）
+    quakeAlwaysIntensity: process.env.QUAKE_ALWAYS_INTENSITY || "5-",
   },
   zabbix: {
     url: process.env.ZABBIX_URL || "",

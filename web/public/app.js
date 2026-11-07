@@ -420,7 +420,15 @@
     return dzMap;
   }
   var INTCOL = { "1": "#9fb0c0", "2": "#4e8fd6", "3": "#37a34a", "4": "#f0c419", "5-": "#ff9029", "5+": "#ff6a00", "6-": "#e5362a", "6+": "#b11117", "7": "#7d0b6b" };
+  var INT_ORDER = ["1", "2", "3", "4", "5-", "5+", "6-", "6+", "7"];
   function shLabel(k) { return { "5-": "5弱", "5+": "5強", "6-": "6弱", "6+": "6強" }[k] || k; }
+  function intGte(a, b) { return INT_ORDER.indexOf(a) >= 0 && INT_ORDER.indexOf(a) >= INT_ORDER.indexOf(b); }
+  // YouTube の各種URLから動画ID（ライブID）を取り出す
+  function ytId(url) {
+    if (!url) return null;
+    var m = String(url).match(/(?:\/live\/|[?&]v=|youtu\.be\/|\/embed\/)([A-Za-z0-9_-]{6,})/);
+    return m ? m[1] : null;
+  }
 
   var disasterVisible = false;
   function checkDisaster() {
@@ -439,19 +447,37 @@
     setPage("home"); syncMusicAmbient(); stopSlides();
     setTimeout(function () { if (dzMap) dzMap.invalidateSize(); }, 200);
   }
-  function hideDisaster() { disasterVisible = false; $("disaster").classList.remove("show"); startSlides(); }
+  function hideDisaster() { disasterVisible = false; $("disaster").classList.remove("show"); clearLive(); $("dzLive").hidden = true; $("dzmap").hidden = false; startSlides(); }
   $("dzClose").addEventListener("click", hideDisaster);
+
+  // ライブ配信（NHK等）の切替。showQuake は更新ごとに呼ばれるので、同じ動画を貼り直さない。
+  var liveId = null;
+  function showLive(id) {
+    if (liveId === id) return;        // すでに同じ配信を表示中：貼り直して再生を途切れさせない
+    liveId = id;
+    $("dzLive").innerHTML = '<iframe allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen ' +
+      'src="https://www.youtube.com/embed/' + encodeURIComponent(id) + '?autoplay=1&playsinline=1&rel=0"></iframe>';
+  }
+  function clearLive() { if (liveId !== null) { liveId = null; $("dzLive").innerHTML = ""; } }
 
   function showQuake(q) {
     openDz();
     $("dzBar").className = "dz-bar"; $("dzIcon").textContent = "⚠️";
     $("dzTitle").textContent = "地震情報 ・ 最大震度 " + (q.maxInt ? shLabel(q.maxInt) : "—");
     $("dzSub").textContent = (q.watchHit ? q.watchHit + "で揺れを観測" : (q.hypocenter || "")) ;
-    ensureMap(); dzMap.setView([35.498, 140.115], 9); // 市原市
-    dzLayer.clearLayers();
-    addQuakeMarkers(q);
-    loadChibaGeo(q);
-    var info = [["震源地", q.hypocenter], ["マグニチュード", q.magnitude ? "M" + q.magnitude : "—"], ["発生時刻", q.time ? new Date(q.time).toLocaleString("ja-JP", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "—"], ["津波", q.tsunami || "—"]];
+    // 震度5弱以上ならライブ配信を大きく表示（地図は隠す）。それ未満は従来の千葉マップ。
+    var id = intGte(q.maxInt, settings.quakeLiveMinIntensity || "5-") ? ytId(settings.quakeLiveUrl) : null;
+    if (id) {
+      $("dzmap").hidden = true; $("dzLive").hidden = false; showLive(id);
+    } else {
+      clearLive(); $("dzLive").hidden = true; $("dzmap").hidden = false;
+      ensureMap(); dzMap.setView([35.498, 140.115], 9); // 市原市
+      setTimeout(function () { if (dzMap) dzMap.invalidateSize(); }, 200);
+      dzLayer.clearLayers();
+      addQuakeMarkers(q);
+      loadChibaGeo(q);
+    }
+    var info =[["震源地", q.hypocenter], ["マグニチュード", q.magnitude ? "M" + q.magnitude : "—"], ["発生時刻", q.time ? new Date(q.time).toLocaleString("ja-JP", { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "—"], ["津波", q.tsunami || "—"]];
     var byInt = {};
     (q.cities || []).forEach(function (c) { (byInt[c.int] = byInt[c.int] || []).push(c.name); });
     var listHtml = Object.keys(byInt).sort(function (a, b) { return Object.keys(INTCOL).indexOf(b) - Object.keys(INTCOL).indexOf(a); })
@@ -462,13 +488,16 @@
       '<div class="dz-card"><h3>凡例</h3><div class="legend">' + Object.keys(INTCOL).map(function (k) { return '<span class="l"><span class="sw" style="background:' + INTCOL[k] + '"></span>' + shLabel(k) + "</span>"; }).join("") + "</div></div>";
   }
   function addQuakeMarkers(q) {
-    // 代表地点（座標既知）。市区町村データから震度を引く。
+    // 代表地点（座標既知）。その地点で実際に観測された震度だけを塗る。
+    // ※ 以前は観測が無い時に最大震度(q.maxInt)を流用していたため、東海の地震で
+    //   千葉市が震度5強と誤表示されていた。観測が無ければ「観測なし」(灰)にする。
     var pts = { "市原市": [35.498, 140.115], "千葉市": [35.607, 140.106] };
     Object.keys(pts).forEach(function (name) {
-      var c = (q.cities || []).find(function (x) { return x.name && x.name.indexOf(name.replace(/市$/, "")) >= 0; });
-      var intk = c ? c.int : q.maxInt;
-      L.circleMarker(pts[name], { radius: 12, color: "#fff", weight: 2, fillColor: INTCOL[intk] || "#888", fillOpacity: .9 })
-        .addTo(dzLayer).bindTooltip(name + " 震度" + shLabel(intk || "—"), { permanent: true, direction: "top" });
+      var key = name.replace(/市$/, "");
+      var c = (q.cities || []).find(function (x) { return x.name && x.name.indexOf(key) >= 0; });
+      var intk = c ? c.int : null;   // 観測が無ければ null（最大震度は使わない）
+      L.circleMarker(pts[name], { radius: 12, color: "#fff", weight: 2, fillColor: intk ? (INTCOL[intk] || "#888") : "#2a3340", fillOpacity: intk ? .9 : .4 })
+        .addTo(dzLayer).bindTooltip(name + (intk ? " 震度" + shLabel(intk) : " 観測なし"), { permanent: true, direction: "top" });
     });
   }
   var chibaGeo = null, chibaTried = false;
@@ -494,6 +523,7 @@
     $("dzBar").className = "dz-bar warn"; $("dzIcon").textContent = "🌀";
     $("dzTitle").textContent = "台風情報 ・ 接近中";
     $("dzSub").textContent = "気象庁の台風情報（" + (ty.count || 1) + "個 活動中）";
+    clearLive(); $("dzLive").hidden = true; $("dzmap").hidden = false;
     ensureMap(); dzMap.setView([34.8, 140.2], 7); dzLayer.clearLayers();
     L.circleMarker([35.607, 140.106], { radius: 8, color: "#fff", weight: 2, fillColor: "#e2231a", fillOpacity: .9 }).addTo(dzLayer).bindTooltip("千葉", { permanent: true, direction: "top" });
     // 実データの進路（forecast）があれば描画。構造は今後拡張。
@@ -509,6 +539,7 @@
     $("dzBar").className = "dz-bar" + (emg ? "" : " warn"); $("dzIcon").textContent = "⚠️";
     $("dzTitle").textContent = (emg ? "特別警報" : "気象警報") + " 発表中";
     $("dzSub").textContent = (settings.region || "") + " に警報が出ています";
+    clearLive(); $("dzLive").hidden = true; $("dzmap").hidden = false;
     ensureMap(); dzMap.setView([35.5, 140.1], 9); dzLayer.clearLayers();
     $("dzSide").innerHTML = '<div class="dz-card"><h3>' + (settings.region || "") + 'の警報・注意報</h3>' +
       wn.items.map(function (w) { var col = w.level === "emergency" ? "#b2001a" : w.level === "warning" ? "var(--alert)" : "#f0c419"; var tc = w.level === "advisory" ? "#3a2e00" : "#fff"; return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><span style="background:' + col + ';color:' + tc + ';border-radius:6px;padding:3px 8px;font-size:12px;font-weight:700">' + (w.level === "advisory" ? "注意報" : "警報") + '</span>' + esc(w.name) + "</div>"; }).join("") + "</div>";

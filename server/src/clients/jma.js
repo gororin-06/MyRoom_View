@@ -141,8 +141,9 @@ export async function getQuake() {
   const watch = config.jma.quakeWatchCities;
   const hitCity = cities.find((c) => watch.some((w) => c.name?.includes(w.replace(/市$/, "")) || c.name?.includes(w)));
   const meetsMin = maxInt && intGte(maxInt, config.jma.quakeMinIntensity);
-  // 表示条件: 最小震度以上 かつ 対象市区町村で観測
-  const active = Boolean(meetsMin && (hitCity || watch.length === 0));
+  const big = maxInt && intGte(maxInt, config.jma.quakeAlwaysIntensity);
+  // 表示条件: 大地震(既定=震度5弱以上)は全国どこでも表示 / それ未満は最小震度以上かつ対象市区町村で観測
+  const active = Boolean(big) || Boolean(meetsMin && (hitCity || watch.length === 0));
 
   return {
     active,

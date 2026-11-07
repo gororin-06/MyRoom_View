@@ -19,6 +19,10 @@ export const DEFAULT_SETTINGS = {
   nightStart: 0,        // 深夜モード 開始(時)
   nightEnd: 6,          // 深夜モード 終了(時)
   autoUpdate: true,
+  // 震度が一定以上の地震が来たら、地図の代わりにライブ配信（NHK等）を表示する。
+  // quakeLiveUrl が空なら無効。YouTube の /live/・watch?v=・youtu.be 形式に対応。
+  quakeLiveUrl: "https://www.youtube.com/live/Odz4oWGT4NY",
+  quakeLiveMinIntensity: "5-", // この震度以上で配信に切替（5-=震度5弱）
   // プロジェクター連動：指定アドレス(host:port)が疎通 OFF→ON（起動）した時、照明がONなら確認後に消灯。
   // この疎通チェックはサーバー一覧には出さない、連動専用の裏チェック。
   // { enabled, host, port, lightId, seconds }

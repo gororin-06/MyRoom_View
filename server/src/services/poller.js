@@ -48,6 +48,7 @@ function publicSettings() {
     weather: s.weather, room: s.room, server: s.server, region: s.region,
     nightStart: s.nightStart, nightEnd: s.nightEnd, autoUpdate: s.autoUpdate,
     musicScreensaver: s.musicScreensaver,
+    quakeLiveUrl: s.quakeLiveUrl, quakeLiveMinIntensity: s.quakeLiveMinIntensity,
   };
 }
 
