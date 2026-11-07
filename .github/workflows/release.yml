@@ -1,0 +1,54 @@
+name: Release
+
+# 手動起動でGitHub Releaseを作成する。
+# 実行したブランチ/コミットにタグを付けてReleaseを発行する。
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "リリースタグ (例: v0.5.0)"
+        required: true
+      title:
+        description: "リリースタイトル（省略時はタグ名）"
+        required: false
+      notes:
+        description: "リリース本文（省略時は自動生成）"
+        required: false
+      prerelease:
+        description: "プレリリースにする"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+          TITLE: ${{ inputs.title }}
+          NOTES: ${{ inputs.notes }}
+          PRERELEASE: ${{ inputs.prerelease }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          title="${TITLE:-$TAG}"
+          args=( "$TAG" --target "$SHA" --title "$title" )
+          if [ "$PRERELEASE" = "true" ]; then args+=( --prerelease ); fi
+          if [ -n "${NOTES:-}" ]; then
+            printf '%s' "$NOTES" > "$RUNNER_TEMP/notes.md"
+            args+=( --notes-file "$RUNNER_TEMP/notes.md" )
+          else
+            args+=( --generate-notes )
+          fi
+          gh release create "${args[@]}"
